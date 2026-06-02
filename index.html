@@ -43,7 +43,7 @@ Updated: <span id="time"></span>
 
 async function loadData(){
 
-    let res = await fetch("data.json");
+    let res = await fetch("data.json?t=" + new Date().getTime());
     let d = await res.json();
 
     document.getElementById("nvda").innerText = d.nvda;
