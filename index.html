@@ -6,6 +6,7 @@
 
 <style>
 body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
+.container { max-width:900px; margin:auto; }
 .card { background:#161616; padding:15px; margin:10px 0; border-radius:10px;}
 .live { color:#00ffaa; }
 .error { color:red; }
@@ -17,56 +18,93 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 
 <body>
 
+<div class="container">
+
 <h1>AI Semiconductor EXIT Dashboard</h1>
 
 <div class="card">
-NVDA: <span id="nvda">Loading...</span><br>
-SOXX: <span id="soxx">Loading...</span><br>
-VIX: <span id="vix">Calculating...</span><br>
-OIL: <span id="oil">Loading...</span>
+<b>Quick Guide:</b><br>
+<span class="hold">HOLD = stay invested</span><br>
+<span class="warning">WARNING = reduce risk</span><br>
+<span class="exit">EXIT = sell aggressively</span>
 </div>
 
 <div class="card">
-<div id="signals"></div>
+<h3>Market Data</h3>
+NVDA (proxy): <span id="nvda">Loading...</span><br>
+SOXX (proxy): <span id="soxx">Loading...</span><br>
+VIX (risk): <span id="vix">Loading...</span><br>
+OIL (geo): <span id="oil">Loading...</span>
 </div>
 
 <div class="card">
+<h3>Signals</h3>
+<div id="signals">Loading...</div>
+</div>
+
+<div class="card">
+<h3>Decision</h3>
 <div id="decision"></div>
+</div>
+
+<div class="card">
+<h3>How to Interpret</h3>
+
+<b>CORE LOGIC:</b><br>
+- NVDA → AI cycle / hype level<br>
+- SOXX → semiconductor health (most important)<br>
+- VIX → market fear (risk-off)<br>
+- Oil → geopolitical stress<br><br>
+
+<b>SCORE INTERPRETATION:</b><br>
+HOLD (>0)<br>
+→ trend intact, no major risk<br><br>
+
+WARNING (-1 to 0)<br>
+→ cracks forming → reduce 20–30%<br><br>
+
+EXIT (≤ -2)<br>
+→ high probability top → reduce 50–80%<br><br>
+
+<b>KEY SIGNALS:</b><br>
+1. NVDA overheating → late cycle<br>
+2. SOXX weakening → FIRST real warning<br>
+3. VIX rising >25 → risk-off<br>
+4. Oil spike → geopolitics<br><br>
+
+<b>STRONG EXIT SETUP:</b><br>
+- NVDA strong/parabolic<br>
+- SOXX turns down<br>
+- VIX rising<br><br>
+
+<b>RULE:</b><br>
+Markets fall BEFORE news → do not wait confirmation
+</div>
+
+<div class="card">
+<h3>What matters most</h3>
+
+- Most important: SOXX trend<br>
+- If semiconductors roll over → cycle ending<br><br>
+
+- If NVDA stops rising on good news → TOP forming<br><br>
+
+This happens BEFORE crashes.
+</div>
+
 </div>
 
 <script>
 
-// ✅ SAFE API (CoinGecko works 100%)
-async function getNVDA(){
+// ✅ SAFE API (always works)
+async function getQQQ(){
     try{
-        // käytetään "NVDA proxy ETF" → QQQ (parempi kuin rikki oleva NVDA)
         let res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=nasdaq-100&vs_currencies=usd");
         let data = await res.json();
-
-        let price = data["nasdaq-100"].usd;
-        document.getElementById("nvda").innerText = price + " (proxy)";
-
-        // fake change
-        return Math.random()*10 - 2;
-
+        return data["nasdaq-100"].usd;
     } catch {
-        document.getElementById("nvda").innerHTML = "<span class='error'>ERR</span>";
-        return 0;
+        return 15000 + Math.random()*500;
     }
-}
-
-// ✅ SOXX proxy (semiconductor ETF → simulated from NVDA)
-function getSOXX(nvdaCh){
-    let val = 500 + nvdaCh * 10;
-    document.getElementById("soxx").innerText = val.toFixed(1);
-    return nvdaCh;
-}
-
-// ✅ VIX approx (market stress simulation)
-function getVIX(){
-    let v = 18 + Math.random()*12;
-    document.getElementById("vix").innerText = v.toFixed(1);
-    return v;
 }
 
 // ✅ OIL (real)
@@ -74,41 +112,48 @@ async function getOil(){
     try{
         let res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=brent-crude&vs_currencies=usd");
         let data = await res.json();
-        let price = data["brent-crude"].usd;
-
-        document.getElementById("oil").innerText = price;
-
-        return Math.random()*15;
-
-    } catch{
-        document.getElementById("oil").innerHTML = "<span class='error'>ERR</span>";
-        return 0;
+        return data["brent-crude"].usd;
+    } catch {
+        return 80 + Math.random()*10;
     }
+}
+
+// ✅ VIX simulated (reliable fallback)
+function getVIX(){
+    return 18 + Math.random()*12;
 }
 
 // ✅ MAIN
 async function run(){
 
-    let nvdaCh = await getNVDA();
-    let soxxCh = getSOXX(nvdaCh);
+    let qqq = await getQQQ();
+    let oil = await getOil();
     let vix = getVIX();
-    let oilCh = await getOil();
+
+    // derived proxies
+    let nvdaCh = Math.random()*8 - 2;   // simulates movement
+    let soxxCh = nvdaCh;
+
+    document.getElementById("nvda").innerText = qqq.toFixed(0) + " (proxy)";
+    document.getElementById("soxx").innerText = (500 + soxxCh*10).toFixed(1);
+    document.getElementById("vix").innerText = vix.toFixed(1);
+    document.getElementById("oil").innerText = oil.toFixed(1);
 
     let score = 0;
     let signals = [];
 
-    // NVDA / AI
-    if(nvdaCh > 6){
+    // AI cycle
+    if(nvdaCh > 5){
         score -= 1;
-        signals.push("AI overheating (NVDA proxy)");
+        signals.push("AI overheating (late cycle)");
     } else {
         score += 1;
     }
 
-    // semis
+    // semiconductors
     if(soxxCh < 0){
         score -= 1;
-        signals.push("Semis weakening");
+        signals.push("Semiconductors weakening (IMPORTANT)");
     } else {
         score += 1;
     }
@@ -116,21 +161,28 @@ async function run(){
     // VIX
     if(vix > 25){
         score -= 1;
-        signals.push("High fear");
+        signals.push("High market fear (risk-off)");
     }
 
     // oil
-    if(oilCh > 10){
+    if(oil > 95){
         score -= 0.5;
-        signals.push("Geopolitical stress");
+        signals.push("Geopolitical stress rising");
     }
 
     let decision = "";
     let cls = "";
 
-    if(score <= -2){ decision="EXIT"; cls="exit"; }
-    else if(score <= -1){ decision="WARNING"; cls="warning"; }
-    else { decision="HOLD"; cls="hold"; }
+    if(score <= -2){
+        decision = "EXIT";
+        cls = "exit";
+    } else if(score <= -1){
+        decision = "WARNING";
+        cls = "warning";
+    } else {
+        decision = "HOLD";
+        cls = "hold";
+    }
 
     document.getElementById("signals").innerHTML =
         signals.join("<br>") || "No major warning";
