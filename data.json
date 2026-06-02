@@ -1,9 +1,9 @@
 {
-  "nvda": 0,
-  "nvdaChange": 0,
-  "soxx": 0,
-  "soxxChange": 0,
-  "vix": 0,
-  "oil": 0,
-  "updated": "waiting"
+  "nvda": "222.79",
+  "nvdaChange": "4.79",
+  "soxx": "599.07",
+  "soxxChange": "6.22",
+  "vix": 15.89,
+  "oil": 93.69,
+  "updated": "2026-06-02T18:29:20.725Z"
 }
