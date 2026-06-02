@@ -3,14 +3,15 @@ name: Update Market Data
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "*/30 * * * *"   # 30 min välein
 
 jobs:
   update:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -20,14 +21,22 @@ jobs:
       - name: Install dependencies
         run: npm install node-fetch
 
-      - name: Run script
+      - name: Run update script
         run: node update.js
 
-      - name: Commit changes
+      - name: Commit and push changes
         run: |
           git config user.name "bot"
           git config user.email "bot@test.com"
-          git pull --rebase
+
+          # lisää muutokset
           git add data.json
+
+          # commit (ei kaadu jos ei muutoksia)
           git commit -m "update data" || exit 0
+
+          # hae viimeisin repo ennen pushia
+          git pull --rebase
+
+          # push takaisin GitHubiin
           git push
