@@ -1,3 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Semiconductor EXIT Dashboard</title>
+
+<style>
+body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
+.container { max-width:900px; margin:auto; }
+.card { background:#161616; padding:15px; margin:10px 0; border-radius:10px;}
+.exit { color:red; font-weight:bold;}
+.warning { color:orange;}
+.hold { color:lime;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>AI Semiconductor EXIT Dashboard (Real Data)</h1>
+
+<div class="card">
+<h3>Market Data</h3>
+NVDA: <span id="nvda"></span><br>
+SOXX: <span id="soxx"></span><br>
+VIX: <span id="vix"></span><br>
+OIL: <span id="oil"></span><br>
+Updated: <span id="time"></span>
+</div>
+
+<div class="card">
+<h3>Signals</h3>
+<div id="signals"></div>
+</div>
+
+<div class="card">
+<h3>Decision</h3>
+<div id="decision"></div>
+</div>
+
 <script>
 
 async function loadData(){
@@ -5,25 +46,18 @@ async function loadData(){
     let res = await fetch("data.json?t=" + new Date().getTime());
     let d = await res.json();
 
-    // ✅ CONVERT TO NUMBER (TÄMÄ OLI PUUTTUVA)
-    let nvdaChange = parseFloat(d.nvdaChange);
-    let soxxChange = parseFloat(d.soxxChange);
-    let vix = parseFloat(d.vix);
-    let oil = parseFloat(d.oil);
-
-    // display data
-    document.getElementById("nvda").innerText = d.nvda + " (" + nvdaChange.toFixed(2) + "%)";
-    document.getElementById("soxx").innerText = d.soxx + " (" + soxxChange.toFixed(2) + "%)";
-    document.getElementById("vix").innerText = vix;
-    document.getElementById("oil").innerText = oil;
+    document.getElementById("nvda").innerText = d.nvda;
+    document.getElementById("soxx").innerText = d.soxx;
+    document.getElementById("vix").innerText = d.vix;
+    document.getElementById("oil").innerText = d.oil;
     document.getElementById("time").innerText = d.updated;
 
     // ===== SIGNALS =====
 
-    let soxxSignal = soxxChange > 0 ? 1 : -1;
-    let nvdaSignal = nvdaChange > 5 ? -1 : 1;
-    let vixSignal = vix > 25 ? -1 : 0;
-    let oilSignal = oil > 95 ? -0.5 : 0;
+    let soxxSignal = d.soxxChange > 0 ? 1 : -1;
+    let nvdaSignal = d.nvdaChange > 5 ? -1 : 1;
+    let vixSignal = d.vix > 25 ? -1 : 0;
+    let oilSignal = d.oil > 95 ? -0.5 : 0;
 
     let score =
         0.4 * soxxSignal +
@@ -31,51 +65,12 @@ async function loadData(){
         0.2 * vixSignal +
         0.1 * oilSignal;
 
-    // ===== EXPLANATIONS =====
-
-    document.getElementById("soxxExplain").innerText =
-        soxxSignal > 0
-        ? "Semiconductor trend strong → demand intact"
-        : "Semiconductors weakening → early cycle warning";
-
-    document.getElementById("nvdaExplain").innerText =
-        nvdaSignal > 0
-        ? "Healthy AI growth (not overheated)"
-        : "AI overheating → late cycle risk";
-
-    document.getElementById("vixExplain").innerText =
-        vixSignal === 0
-        ? "Low volatility → stable market"
-        : "High volatility → risk-off environment";
-
-    document.getElementById("oilExplain").innerText =
-        oilSignal === 0
-        ? "No major geopolitical stress"
-        : "Oil spike → geopolitical risk";
-
-    // ===== SIGNAL LIST =====
-
     let signals = [];
 
     if(nvdaSignal === -1) signals.push("AI overheating (NVDA)");
-    if(soxxSignal === -1) signals.push("Semiconductors weakening (CRITICAL)");
-    if(vixSignal === -1) signals.push("Market risk rising (VIX)");
+    if(soxxSignal === -1) signals.push("Semiconductors weakening");
+    if(vixSignal === -1) signals.push("High market fear (VIX)");
     if(oilSignal < 0) signals.push("Geopolitical stress");
-
-    let defaultMsg;
-
-    if(score > 0.5){
-        defaultMsg = "Strong trend (no signs of cycle turning)";
-    } else if(score > 0){
-        defaultMsg = "Late-cycle trend → monitor closely";
-    } else {
-        defaultMsg = "No major signals yet";
-    }
-
-    document.getElementById("signals").innerHTML =
-        signals.length ? signals.join("<br>") : defaultMsg;
-
-    // ===== FINAL DECISION =====
 
     let decision = "";
     let cls = "";
@@ -87,19 +82,23 @@ async function loadData(){
         decision = "WARNING";
         cls = "warning";
     } else if(score < 0.5){
-        decision = "HOLD (Late Cycle)";
+        decision = "HOLD (Late)";
         cls = "warning";
     } else {
         decision = "HOLD (Strong)";
         cls = "hold";
     }
 
+    document.getElementById("signals").innerHTML =
+        signals.join("<br>") || "No major signals";
+
     document.getElementById("decision").innerHTML =
-        `<span class="${cls}">
-        ${decision} (score ${score.toFixed(2)})
-        </span>`;
+        `<span class="${cls}">${decision} (score ${score.toFixed(2)})</span>`;
 }
 
 loadData();
 
 </script>
+
+</body>
+</html>
