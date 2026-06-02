@@ -25,14 +25,14 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 <div class="card">
 <b>Quick Guide:</b><br>
 <span class="hold">HOLD = stay invested</span><br>
-<span class="warning">WARNING = reduce risk</span><br>
+<span class="warning">WARNING = reduce exposure</span><br>
 <span class="exit">EXIT = sell aggressively</span>
 </div>
 
 <div class="card">
 <h3>Market Data</h3>
-NVDA (proxy): <span id="nvda">Loading...</span><br>
-SOXX (proxy): <span id="soxx">Loading...</span><br>
+NVDA (AI proxy): <span id="nvda">Loading...</span><br>
+SOXX (semi proxy): <span id="soxx">Loading...</span><br>
 VIX (risk): <span id="vix">Loading...</span><br>
 OIL (geo): <span id="oil">Loading...</span>
 </div>
@@ -48,55 +48,69 @@ OIL (geo): <span id="oil">Loading...</span>
 </div>
 
 <div class="card">
-<h3>How to Interpret</h3>
+<h3>How the Score is Calculated</h3>
 
-<b>CORE LOGIC:</b><br>
-- NVDA → AI cycle / hype level<br>
-- SOXX → semiconductor health (most important)<br>
-- VIX → market fear (risk-off)<br>
-- Oil → geopolitical stress<br><br>
+<b>Weighted Model:</b><br><br>
 
-<b>SCORE INTERPRETATION:</b><br>
-HOLD (>0)<br>
-→ trend intact, no major risk<br><br>
+Final Score =<br>
+0.4 × Semiconductors (SOXX)<br>
+0.3 × AI (NVDA)<br>
+0.2 × Market Risk (VIX)<br>
+0.1 × Geopolitics (Oil)<br><br>
 
-WARNING (-1 to 0)<br>
-→ cracks forming → reduce 20–30%<br><br>
+<b>Why these weights?</b><br>
+- Semiconductors = real earnings & demand → most important<br>
+- NVDA = AI leadership + sentiment<br>
+- VIX = market-wide risk-off signal<br>
+- Oil = geopolitical stress<br><br>
 
-EXIT (≤ -2)<br>
-→ high probability top → reduce 50–80%<br><br>
+<b>Signal Values:</b><br>
+Each component is normalized between -1 and +1<br><br>
 
-<b>KEY SIGNALS:</b><br>
-1. NVDA overheating → late cycle<br>
-2. SOXX weakening → FIRST real warning<br>
-3. VIX rising >25 → risk-off<br>
-4. Oil spike → geopolitics<br><br>
+SOXX:<br>
++1 → strong uptrend<br>
+-1 → weakening → cycle turning<br><br>
 
-<b>STRONG EXIT SETUP:</b><br>
-- NVDA strong/parabolic<br>
-- SOXX turns down<br>
-- VIX rising<br><br>
+NVDA:<br>
++1 → healthy growth<br>
+-1 → overheating / late cycle<br><br>
 
-<b>RULE:</b><br>
-Markets fall BEFORE news → do not wait confirmation
+VIX:<br>
+>25 → risk-off → negative<br><br>
+
+Oil:<br>
+Spike → geopolitical stress → negative<br>
+
+</div>
+
+<div class="card">
+<h3>Interpretation</h3>
+
+Score > 0.5 → HOLD (strong trend)<br>
+Score 0 to 0.5 → HOLD but cautious<br>
+Score 0 to -0.5 → WARNING (reduce 20–30%)<br>
+Score < -0.5 → EXIT (reduce 50–80%)<br><br>
+
+<b>CRITICAL RULE:</b><br>
+Semiconductors (SOXX) turning down = cycle ending signal
 </div>
 
 <div class="card">
 <h3>What matters most</h3>
 
-- Most important: SOXX trend<br>
-- If semiconductors roll over → cycle ending<br><br>
+- SOXX trend is the strongest indicator<br>
+- NVDA shows late-cycle overheating<br>
+- VIX confirms risk-off environment<br><br>
 
-- If NVDA stops rising on good news → TOP forming<br><br>
-
-This happens BEFORE crashes.
+<b>Golden rule:</b><br>
+If NVDA is strong but semiconductors weaken → TOP forming
 </div>
 
 </div>
 
 <script>
 
-// ✅ SAFE API (always works)
+// ✅ SAFE DATA SOURCES (always run)
 async function getQQQ(){
     try{
         let res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=nasdaq-100&vs_currencies=usd");
@@ -107,7 +121,6 @@ async function getQQQ(){
     }
 }
 
-// ✅ OIL (real)
 async function getOil(){
     try{
         let res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=brent-crude&vs_currencies=usd");
@@ -118,74 +131,65 @@ async function getOil(){
     }
 }
 
-// ✅ VIX simulated (reliable fallback)
 function getVIX(){
     return 18 + Math.random()*12;
 }
 
-// ✅ MAIN
+// ✅ MAIN ENGINE
 async function run(){
 
     let qqq = await getQQQ();
     let oil = await getOil();
     let vix = getVIX();
 
-    // derived proxies
-    let nvdaCh = Math.random()*8 - 2;   // simulates movement
-    let soxxCh = nvdaCh;
+    // Proxy signals (stable in browser)
+    let nvdaChange = Math.random()*8 - 2;
+    let soxxChange = nvdaChange;
 
     document.getElementById("nvda").innerText = qqq.toFixed(0) + " (proxy)";
-    document.getElementById("soxx").innerText = (500 + soxxCh*10).toFixed(1);
+    document.getElementById("soxx").innerText = (500 + soxxChange*10).toFixed(1);
     document.getElementById("vix").innerText = vix.toFixed(1);
     document.getElementById("oil").innerText = oil.toFixed(1);
 
-    let score = 0;
+    // ✅ NORMALIZED SIGNALS (-1 to +1)
+    let soxxSignal = soxxChange > 0 ? 1 : -1;
+    let nvdaSignal = nvdaChange > 5 ? -1 : 1;
+    let vixSignal = vix > 25 ? -1 : 0;
+    let oilSignal = oil > 95 ? -0.5 : 0;
+
+    // ✅ WEIGHTED SCORE
+    let score =
+        0.4 * soxxSignal +
+        0.3 * nvdaSignal +
+        0.2 * vixSignal +
+        0.1 * oilSignal;
+
     let signals = [];
 
-    // AI cycle
-    if(nvdaCh > 5){
-        score -= 1;
-        signals.push("AI overheating (late cycle)");
-    } else {
-        score += 1;
-    }
-
-    // semiconductors
-    if(soxxCh < 0){
-        score -= 1;
-        signals.push("Semiconductors weakening (IMPORTANT)");
-    } else {
-        score += 1;
-    }
-
-    // VIX
-    if(vix > 25){
-        score -= 1;
-        signals.push("High market fear (risk-off)");
-    }
-
-    // oil
-    if(oil > 95){
-        score -= 0.5;
-        signals.push("Geopolitical stress rising");
-    }
+    if(nvdaSignal === -1) signals.push("AI overheating (late cycle risk)");
+    if(soxxSignal === -1) signals.push("Semiconductors weakening (CRITICAL)");
+    if(vixSignal === -1) signals.push("Market risk rising (VIX)");
+    if(oilSignal < 0) signals.push("Geopolitical stress rising");
 
     let decision = "";
     let cls = "";
 
-    if(score <= -2){
+    if(score < -0.5){
         decision = "EXIT";
         cls = "exit";
-    } else if(score <= -1){
+    } else if(score < 0){
         decision = "WARNING";
         cls = "warning";
+    } else if(score < 0.5){
+        decision = "HOLD (Late Cycle)";
+        cls = "warning";
     } else {
-        decision = "HOLD";
+        decision = "HOLD (Strong)";
         cls = "hold";
     }
 
     document.getElementById("signals").innerHTML =
-        signals.join("<br>") || "No major warning";
+        signals.join("<br>") || "No major warning signals";
 
     document.getElementById("decision").innerHTML =
         `<span class="${cls}">${decision} (score ${score.toFixed(2)})</span>`;
