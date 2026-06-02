@@ -58,6 +58,24 @@ Updated: <span id="time"></span>
 <div id="decision"></div>
 </div>
 
+<div class="card">
+<h3>Score Explanation</h3>
+
+<div id="scoreExplain"></div><br>
+
+<div class="small">
+<b>Score formula:</b><br>
+= 0.4×SOXX + 0.3×NVDA + 0.2×VIX + 0.1×OIL<br><br>
+
+<b>Interpretation:</b><br>
+> 0.5 → Strong bull trend<br>
+0 to 0.5 → Late cycle<br>
+0 to -0.5 → Warning (risk increasing)<br>
+< -0.5 → Exit zone (high probability top)<br>
+</div>
+
+</div>
+
 </div>
 
 <script>
@@ -66,11 +84,9 @@ async function loadData(){
 
     try {
 
-        // ✅ cache bypass
         let res = await fetch("data.json?t=" + new Date().getTime());
         let d = await res.json();
 
-        // ✅ turvallinen numeric conversion
         let nvda = parseFloat(d.nvda);
         let soxx = parseFloat(d.soxx);
         let nvdaChange = parseFloat(d.nvdaChange);
@@ -78,12 +94,10 @@ async function loadData(){
         let vix = parseFloat(d.vix);
         let oil = parseFloat(d.oil);
 
-        // ✅ turvacheck
         if(isNaN(nvdaChange) || isNaN(soxxChange)){
             throw new Error("Invalid data values");
         }
 
-        // ===== UI =====
         document.getElementById("nvda").innerText = nvda + " (" + nvdaChange.toFixed(2) + "%)";
         document.getElementById("soxx").innerText = soxx + " (" + soxxChange.toFixed(2) + "%)";
         document.getElementById("vix").innerText = vix;
@@ -91,6 +105,7 @@ async function loadData(){
         document.getElementById("time").innerText = d.updated;
 
         // ===== SIGNALS =====
+
         let soxxSignal = soxxChange > 0 ? 1 : -1;
         let nvdaSignal = nvdaChange > 5 ? -1 : 1;
         let vixSignal = vix > 25 ? -1 : 0;
@@ -106,46 +121,48 @@ async function loadData(){
 
         document.getElementById("soxxExplain").innerText =
             soxxSignal > 0
-            ? "Semiconductor trend strong → demand intact"
-            : "Semiconductors weakening → early cycle warning";
+            ? "Semiconductors rising → demand strong"
+            : "Semiconductors weakening → early warning";
 
         document.getElementById("nvdaExplain").innerText =
             nvdaSignal > 0
-            ? "Healthy AI growth (no overheating)"
-            : "AI overheating → late cycle risk";
+            ? "AI growth healthy"
+            : "AI overheating → late cycle";
 
         document.getElementById("vixExplain").innerText =
             vixSignal === 0
-            ? "Low volatility → stable market"
-            : "High volatility → risk-off environment";
+            ? "Low volatility → stable"
+            : "High volatility → risk-off";
 
         document.getElementById("oilExplain").innerText =
             oilSignal === 0
-            ? "No major geopolitical stress"
+            ? "No major macro stress"
             : "Oil spike → geopolitical risk";
 
         // ===== SIGNAL LIST =====
+
         let signals = [];
 
-        if(nvdaSignal === -1) signals.push("AI overheating (NVDA)");
+        if(nvdaSignal === -1) signals.push("AI overheating");
         if(soxxSignal === -1) signals.push("Semiconductors weakening");
-        if(vixSignal === -1) signals.push("High market fear (VIX)");
+        if(vixSignal === -1) signals.push("Market risk rising");
         if(oilSignal < 0) signals.push("Geopolitical stress");
 
         let defaultMsg;
 
         if(score > 0.5){
-            defaultMsg = "Strong trend (no signs of cycle turning)";
+            defaultMsg = "Strong trend intact";
         } else if(score > 0){
-            defaultMsg = "Late-cycle trend → monitor closely";
+            defaultMsg = "Late-cycle conditions";
         } else {
-            defaultMsg = "No major signals yet";
+            defaultMsg = "No major warning signals yet";
         }
 
         document.getElementById("signals").innerHTML =
             signals.length ? signals.join("<br>") : defaultMsg;
 
         // ===== DECISION =====
+
         let decision = "";
         let cls = "";
 
@@ -165,6 +182,29 @@ async function loadData(){
 
         document.getElementById("decision").innerHTML =
             `<span class="${cls}">${decision} (score ${score.toFixed(2)})</span>`;
+
+        // ===== SCORE EXPLANATION =====
+
+        let scoreText = "";
+
+        scoreText += "SOXX contributes: " + (0.4 * soxxSignal).toFixed(2) + "<br>";
+        scoreText += "NVDA contributes: " + (0.3 * nvdaSignal).toFixed(2) + "<br>";
+        scoreText += "VIX contributes: " + (0.2 * vixSignal).toFixed(2) + "<br>";
+        scoreText += "OIL contributes: " + (0.1 * oilSignal).toFixed(2) + "<br><br>";
+
+        scoreText += "<b>Total Score: " + score.toFixed(2) + "</b><br><br>";
+
+        if(score > 0.5){
+            scoreText += "→ Market in strong uptrend (low exit risk)";
+        } else if(score > 0){
+            scoreText += "→ Late-stage trend (watch for cracks)";
+        } else if(score > -0.5){
+            scoreText += "→ Warning phase (reduce exposure gradually)";
+        } else {
+            scoreText += "→ Exit zone (high probability of cycle turning)";
+        }
+
+        document.getElementById("scoreExplain").innerHTML = scoreText;
 
     } catch (err) {
 
