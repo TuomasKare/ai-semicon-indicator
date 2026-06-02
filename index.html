@@ -11,14 +11,16 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 .exit { color:red; font-weight:bold;}
 .warning { color:orange;}
 .hold { color:lime;}
+.small { color:#aaa; font-size:13px;}
 </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>AI Semiconductor EXIT Dashboard (Real Data)</h1>
+<h1>AI Semiconductor EXIT Dashboard</h1>
 
 <div class="card">
 <h3>Market Data</h3>
@@ -30,13 +32,55 @@ Updated: <span id="time"></span>
 </div>
 
 <div class="card">
+<h3>Indicator Interpretation</h3>
+
+<b>SOXX (40%)</b><br>
+<span id="soxxExplain"></span><br><br>
+
+<b>NVDA (30%)</b><br>
+<span id="nvdaExplain"></span><br><br>
+
+<b>VIX (20%)</b><br>
+<span id="vixExplain"></span><br><br>
+
+<b>OIL (10%)</b><br>
+<span id="oilExplain"></span>
+
+</div>
+
+<div class="card">
 <h3>Signals</h3>
 <div id="signals"></div>
 </div>
 
 <div class="card">
-<h3>Decision</h3>
+<h3>Final Decision</h3>
 <div id="decision"></div>
+</div>
+
+<div class="card">
+<h3>How to Interpret the System</h3>
+
+<b>Purpose:</b><br>
+Detect when AI + semiconductor cycle is turning (not predict price)<br><br>
+
+<b>Weights:</b><br>
+SOXX = 40% (real demand)<br>
+NVDA = 30% (AI hype / timing)<br>
+VIX = 20% (market risk)<br>
+OIL = 10% (macro/geopolitics)<br><br>
+
+<b>Critical Rule:</b><br>
+If NVDA rises but SOXX weakens → TOP forming<br><br>
+
+<b>Score meaning:</b><br>
+> 0.5 → Strong bull trend<br>
+0 to 0.5 → Late cycle<br>
+0 to -0.5 → Warning<br>
+< -0.5 → Exit zone<br>
+
+</div>
+
 </div>
 
 <script>
@@ -46,32 +90,71 @@ async function loadData(){
     let res = await fetch("data.json?t=" + new Date().getTime());
     let d = await res.json();
 
-    document.getElementById("nvda").innerText = d.nvda;
-    document.getElementById("soxx").innerText = d.soxx;
+    // display data
+    document.getElementById("nvda").innerText = d.nvda + " (" + d.nvdaChange.toFixed(2) + "%)";
+    document.getElementById("soxx").innerText = d.soxx + " (" + d.soxxChange.toFixed(2) + "%)";
     document.getElementById("vix").innerText = d.vix;
     document.getElementById("oil").innerText = d.oil;
     document.getElementById("time").innerText = d.updated;
 
-    // ===== SIGNALS =====
-
+    // ===== SIGNAL NORMALIZATION =====
     let soxxSignal = d.soxxChange > 0 ? 1 : -1;
     let nvdaSignal = d.nvdaChange > 5 ? -1 : 1;
     let vixSignal = d.vix > 25 ? -1 : 0;
     let oilSignal = d.oil > 95 ? -0.5 : 0;
 
+    // ===== WEIGHTED SCORE =====
     let score =
         0.4 * soxxSignal +
         0.3 * nvdaSignal +
         0.2 * vixSignal +
         0.1 * oilSignal;
 
+    // ===== EXPLANATIONS =====
+
+    document.getElementById("soxxExplain").innerText =
+        soxxSignal > 0
+        ? "Semiconductor trend strong → demand intact"
+        : "Semiconductors weakening → early cycle warning";
+
+    document.getElementById("nvdaExplain").innerText =
+        nvdaSignal > 0
+        ? "Healthy AI growth (not overheated)"
+        : "AI overheating → late cycle risk";
+
+    document.getElementById("vixExplain").innerText =
+        vixSignal === 0
+        ? "Low volatility → stable market"
+        : "High volatility → risk-off environment";
+
+    document.getElementById("oilExplain").innerText =
+        oilSignal === 0
+        ? "No major geopolitical stress"
+        : "Oil spike → geopolitical / macro risk";
+
+    // ===== SIGNAL LIST =====
     let signals = [];
 
     if(nvdaSignal === -1) signals.push("AI overheating (NVDA)");
-    if(soxxSignal === -1) signals.push("Semiconductors weakening");
-    if(vixSignal === -1) signals.push("High market fear (VIX)");
+    if(soxxSignal === -1) signals.push("Semiconductors weakening (CRITICAL)");
+    if(vixSignal === -1) signals.push("Market risk rising (VIX)");
     if(oilSignal < 0) signals.push("Geopolitical stress");
 
+    // ===== DEFAULT STATUS =====
+    let defaultMsg;
+
+    if(score > 0.5){
+        defaultMsg = "Strong trend (no signs of cycle turning)";
+    } else if(score > 0){
+        defaultMsg = "Late-cycle trend → monitor closely";
+    } else {
+        defaultMsg = "No major signals yet";
+    }
+
+    document.getElementById("signals").innerHTML =
+        signals.length ? signals.join("<br>") : defaultMsg;
+
+    // ===== FINAL DECISION =====
     let decision = "";
     let cls = "";
 
@@ -82,18 +165,17 @@ async function loadData(){
         decision = "WARNING";
         cls = "warning";
     } else if(score < 0.5){
-        decision = "HOLD (Late)";
+        decision = "HOLD (Late Cycle)";
         cls = "warning";
     } else {
         decision = "HOLD (Strong)";
         cls = "hold";
     }
 
-    document.getElementById("signals").innerHTML =
-        signals.join("<br>") || "No major signals";
-
     document.getElementById("decision").innerHTML =
-        `<span class="${cls}">${decision} (score ${score.toFixed(2)})</span>`;
+        `<span class="${cls}">
+        ${decision} (score ${score.toFixed(2)})
+        </span>`;
 }
 
 loadData();
