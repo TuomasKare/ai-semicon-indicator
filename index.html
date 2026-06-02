@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<html lang="fi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Semiconductor Exit Indicator</title>
+<title>AI Semiconductor Exit System (AUTO)</title>
+
 <style>
-body { font-family: Arial; background:#111; color:#eee; padding:20px;}
+body { font-family: Arial; background:#0b0b0b; color:#eee; padding:20px;}
+.container { max-width:1000px; margin:auto; }
+.card { background:#161616; padding:15px; margin:10px 0; border-radius:10px;}
 h1 { color:#00d4ff; }
-.container { max-width:800px; margin:auto; }
-.card { background:#1c1c1c; padding:15px; margin-bottom:15px; border-radius:10px;}
-input { width:100%; padding:8px; margin-top:5px; background:#222; color:#fff; border:1px solid #333;}
-button { padding:12px; width:100%; background:#00d4ff; border:none; font-weight:bold; margin-top:10px; cursor:pointer;}
-.result { font-size:20px; margin-top:10px; }
-.hold { color:lime; }
-.warning { color:orange; }
-.exit { color:red; font-weight:bold; }
+.live { color:#00ffaa; font-weight:bold;}
+.exit { color:red; font-weight:bold;}
+.warning { color:orange;}
+.hold { color:lime;}
 .small { font-size:12px; color:#aaa;}
 </style>
 </head>
@@ -21,135 +20,128 @@ button { padding:12px; width:100%; background:#00d4ff; border:none; font-weight:
 <body>
 <div class="container">
 
-<h1>AI Semiconductor Exit Indicator</h1>
+<h1>AI Semiconductor EXIT Dashboard (Fully Auto)</h1>
 
 <div class="card">
-<h3>CAPEX</h3>
-<label>MSFT Capex YoY (%)</label>
-<input id="msft" type="number">
-
-<label>GOOGL Capex YoY (%)</label>
-<input id="googl" type="number">
-
-<label>AMZN Capex YoY (%)</label>
-<input id="amzn" type="number">
-
-<label>META Capex YoY (%)</label>
-<input id="meta" type="number">
+<h3>Market Data</h3>
+NVDA: <span id="nvda" class="live"></span><br>
+SOXX (Semi ETF): <span id="soxx" class="live"></span><br>
+VIX (Fear): <span id="vix" class="live"></span><br>
+DXY (USD): <span id="dxy" class="live"></span><br>
+Oil: <span id="oil" class="live"></span>
 </div>
 
 <div class="card">
-<h3>COMPUTE</h3>
-<label>GPU Lead Time (months)</label>
-<input id="lead" type="number">
-
-<label>GPU Price Trend</label>
-<select id="price">
-    <option value="1">Up</option>
-    <option value="0">Flat</option>
-    <option value="-1">Down</option>
-</select>
-
-<label>Data Center Utilization (%)</label>
-<input id="dc" type="number">
+<h3>Signals</h3>
+<div id="signals"></div>
 </div>
 
 <div class="card">
-<h3>SENTIMENT</h3>
-<label>NVDA Forward P/E</label>
-<input id="pe" type="number">
-
-<label>AI Sentiment</label>
-<select id="sent">
-    <option value="1">Normal</option>
-    <option value="0">Hot</option>
-    <option value="-1">Mania</option>
-</select>
-
-<label>Parabolic Move</label>
-<select id="para">
-    <option value="0">No</option>
-    <option value="1">Yes</option>
-</select>
-</div>
-
-<button onclick="calculate()">Calculate ASEI Score</button>
-
-<div class="card">
-<h3>Result</h3>
-<div id="score" class="result"></div>
-<div id="signal" class="result"></div>
-<div id="early" class="small"></div>
+<h3>Final Decision</h3>
+<div id="score"></div>
+<div id="decision"></div>
 </div>
 
 </div>
 
 <script>
-function calcCapex(msft, googl, amzn, meta){
-    let avg = (msft + googl + amzn + meta) / 4;
-    if(avg > 10) return 1;
-    if(avg >= 0) return 0;
-    return -1;
+// ========= FETCH FUNCTION =========
+async function fetchData(symbol){
+    let url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1mo&interval=1d`;
+    let res = await fetch(url);
+    let data = await res.json();
+
+    let prices = data.chart.result[0].indicators.quote[0].close;
+    let valid = prices.filter(p => p !== null);
+
+    let first = valid[0];
+    let last = valid[valid.length-1];
+
+    let change = ((last-first)/first)*100;
+
+    return { price:last, change:change };
 }
 
-function calcCompute(lead, price){
-    if(lead > 6) return 1;
-    if(lead >= 3) return 0;
-    return -1;
-}
+// ========= LOAD ALL =========
+async function load(){
 
-function calcSentiment(sent, para){
-    if(sent == -1 && para == 1) return -1;
-    if(sent == 0) return 0;
-    return 1;
-}
+    let nvda = await fetchData("NVDA");
+    let soxx = await fetchData("SOXX");
+    let vix = await fetchData("^VIX");
+    let dxy = await fetchData("DX-Y.NYB");
+    let oil = await fetchData("CL=F");
 
-function calculate(){
-    let msft = parseFloat(document.getElementById("msft").value) || 0;
-    let googl = parseFloat(document.getElementById("googl").value) || 0;
-    let amzn = parseFloat(document.getElementById("amzn").value) || 0;
-    let meta = parseFloat(document.getElementById("meta").value) || 0;
+    // DISPLAY
+    document.getElementById("nvda").innerText = nvda.price.toFixed(2) + " (" + nvda.change.toFixed(1) + "%)";
+    document.getElementById("soxx").innerText = soxx.price.toFixed(2) + " (" + soxx.change.toFixed(1) + "%)";
+    document.getElementById("vix").innerText = vix.price.toFixed(2);
+    document.getElementById("dxy").innerText = dxy.price.toFixed(2);
+    document.getElementById("oil").innerText = oil.price.toFixed(2);
 
-    let lead = parseFloat(document.getElementById("lead").value) || 0;
-    let price = parseFloat(document.getElementById("price").value);
+    // ========= SIGNAL LOGIC =========
 
-    let sent = parseFloat(document.getElementById("sent").value);
-    let para = parseFloat(document.getElementById("para").value);
+    let signals = [];
+    let score = 0;
 
-    let capex = calcCapex(msft, googl, amzn, meta);
-    let compute = calcCompute(lead, price);
-    let sentiment = calcSentiment(sent, para);
-
-    let asei = 0.3 * capex + 0.4 * compute + 0.3 * sentiment;
-
-    // Signal
-    let signalText = "";
-    let signalClass = "";
-
-    if(asei < -0.5){
-        signalText = "EXIT";
-        signalClass = "exit";
-    } else if(asei < 0){
-        signalText = "WARNING";
-        signalClass = "warning";
-    } else if(asei < 0.5){
-        signalText = "HOLD (Careful)";
-        signalClass = "warning";
+    // 1. NVDA PARABOLIC
+    if(nvda.change > 25){
+        signals.push("NVDA parabolic → bubble risk");
+        score -= 1;
+    } else if(nvda.change > 10){
+        score -= 0.5;
     } else {
-        signalText = "HOLD";
-        signalClass = "hold";
+        score += 0.5;
     }
 
-    // Early warning logic
-    let early = "";
-    if(lead < 3) early += "GPU supply normalizing → risk rising<br>";
-    if(sent == -1 && para == 1) early += "Market in mania phase<br>";
-    if(capex <= 0) early += "Capex slowing → major warning<br>";
+    // 2. SEMICONDUCTOR TREND (SOXX)
+    if(soxx.change < -10){
+        signals.push("Semiconductors breaking down");
+        score -= 1;
+    } else if(soxx.change > 10){
+        score += 1;
+    }
 
-    document.getElementById("score").innerHTML = "ASEI Score: " + asei.toFixed(2);
-    document.getElementById("signal").innerHTML = "<span class='"+signalClass+"'>" + signalText + "</span>";
-    document.getElementById("early").innerHTML = early || "No major warnings";
+    // 3. VOLATILITY (VIX)
+    if(vix.price > 25){
+        signals.push("Market fear high (VIX)");
+        score -= 1;
+    }
+
+    // 4. DOLLAR (macro tightening)
+    if(dxy.change > 3){
+        signals.push("Dollar rising → liquidity tightening");
+        score -= 0.5;
+    }
+
+    // 5. OIL (geopolitical stress proxy)
+    if(oil.change > 10){
+        signals.push("Oil spike → geopolitical risk");
+        score -= 0.5;
+    }
+
+    // ========= FINAL SCORE =========
+    let decision = "";
+    let cls = "";
+
+    if(score <= -2){
+        decision = "EXIT (High probability top)";
+        cls = "exit";
+    } else if(score <= -1){
+        decision = "WARNING (Reduce exposure)";
+        cls = "warning";
+    } else {
+        decision = "HOLD";
+        cls = "hold";
+    }
+
+    // OUTPUT
+    document.getElementById("signals").innerHTML = signals.join("<br>") || "No major warnings";
+    document.getElementById("score").innerHTML = "Score: " + score.toFixed(2);
+    document.getElementById("decision").innerHTML = "<span class='"+cls+"'>" + decision + "</span>";
 }
+
+// Run
+load();
 </script>
 
 </body>
