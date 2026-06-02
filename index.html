@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<title>AI Semiconductor Exit Indicator</title>
+<style>
+body { font-family: Arial; background:#111; color:#eee; padding:20px;}
+h1 { color:#00d4ff; }
+.container { max-width:800px; margin:auto; }
+.card { background:#1c1c1c; padding:15px; margin-bottom:15px; border-radius:10px;}
+input { width:100%; padding:8px; margin-top:5px; background:#222; color:#fff; border:1px solid #333;}
+button { padding:12px; width:100%; background:#00d4ff; border:none; font-weight:bold; margin-top:10px; cursor:pointer;}
+.result { font-size:20px; margin-top:10px; }
+.hold { color:lime; }
+.warning { color:orange; }
+.exit { color:red; font-weight:bold; }
+.small { font-size:12px; color:#aaa;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>AI Semiconductor Exit Indicator</h1>
+
+<div class="card">
+<h3>CAPEX</h3>
+<label>MSFT Capex YoY (%)</label>
+<input id="msft" type="number">
+
+<label>GOOGL Capex YoY (%)</label>
+<input id="googl" type="number">
+
+<label>AMZN Capex YoY (%)</label>
+<input id="amzn" type="number">
+
+<label>META Capex YoY (%)</label>
+<input id="meta" type="number">
+</div>
+
+<div class="card">
+<h3>COMPUTE</h3>
+<label>GPU Lead Time (months)</label>
+<input id="lead" type="number">
+
+<label>GPU Price Trend</label>
+<select id="price">
+    <option value="1">Up</option>
+    <option value="0">Flat</option>
+    <option value="-1">Down</option>
+</select>
+
+<label>Data Center Utilization (%)</label>
+<input id="dc" type="number">
+</div>
+
+<div class="card">
+<h3>SENTIMENT</h3>
+<label>NVDA Forward P/E</label>
+<input id="pe" type="number">
+
+<label>AI Sentiment</label>
+<select id="sent">
+    <option value="1">Normal</option>
+    <option value="0">Hot</option>
+    <option value="-1">Mania</option>
+</select>
+
+<label>Parabolic Move</label>
+<select id="para">
+    <option value="0">No</option>
+    <option value="1">Yes</option>
+</select>
+</div>
+
+<button onclick="calculate()">Calculate ASEI Score</button>
+
+<div class="card">
+<h3>Result</h3>
+<div id="score" class="result"></div>
+<div id="signal" class="result"></div>
+<div id="early" class="small"></div>
+</div>
+
+</div>
+
+<script>
+function calcCapex(msft, googl, amzn, meta){
+    let avg = (msft + googl + amzn + meta) / 4;
+    if(avg > 10) return 1;
+    if(avg >= 0) return 0;
+    return -1;
+}
+
+function calcCompute(lead, price){
+    if(lead > 6) return 1;
+    if(lead >= 3) return 0;
+    return -1;
+}
+
+function calcSentiment(sent, para){
+    if(sent == -1 && para == 1) return -1;
+    if(sent == 0) return 0;
+    return 1;
+}
+
+function calculate(){
+    let msft = parseFloat(document.getElementById("msft").value) || 0;
+    let googl = parseFloat(document.getElementById("googl").value) || 0;
+    let amzn = parseFloat(document.getElementById("amzn").value) || 0;
+    let meta = parseFloat(document.getElementById("meta").value) || 0;
+
+    let lead = parseFloat(document.getElementById("lead").value) || 0;
+    let price = parseFloat(document.getElementById("price").value);
+
+    let sent = parseFloat(document.getElementById("sent").value);
+    let para = parseFloat(document.getElementById("para").value);
+
+    let capex = calcCapex(msft, googl, amzn, meta);
+    let compute = calcCompute(lead, price);
+    let sentiment = calcSentiment(sent, para);
+
+    let asei = 0.3 * capex + 0.4 * compute + 0.3 * sentiment;
+
+    // Signal
+    let signalText = "";
+    let signalClass = "";
+
+    if(asei < -0.5){
+        signalText = "EXIT";
+        signalClass = "exit";
+    } else if(asei < 0){
+        signalText = "WARNING";
+        signalClass = "warning";
+    } else if(asei < 0.5){
+        signalText = "HOLD (Careful)";
+        signalClass = "warning";
+    } else {
+        signalText = "HOLD";
+        signalClass = "hold";
+    }
+
+    // Early warning logic
+    let early = "";
+    if(lead < 3) early += "GPU supply normalizing → risk rising<br>";
+    if(sent == -1 && para == 1) early += "Market in mania phase<br>";
+    if(capex <= 0) early += "Capex slowing → major warning<br>";
+
+    document.getElementById("score").innerHTML = "ASEI Score: " + asei.toFixed(2);
+    document.getElementById("signal").innerHTML = "<span class='"+signalClass+"'>" + signalText + "</span>";
+    document.getElementById("early").innerHTML = early || "No major warnings";
+}
+</script>
+
+</body>
+</html>
