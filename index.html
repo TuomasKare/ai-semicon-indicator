@@ -1,107 +1,211 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Semiconductor Indicator</title>
-  <style>
-    body {
-      background: #0b0b0b;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-    }
+<meta charset="UTF-8">
+<title>AI Semiconductor EXIT Dashboard</title>
 
-    .box {
-      margin-top: 40px;
-      padding: 20px;
-      border: 1px solid #333;
-      display: inline-block;
-    }
-
-    .score {
-      font-size: 40px;
-      margin: 10px 0;
-    }
-
-    .label {
-      font-size: 20px;
-    }
-
-    .trend {
-      font-size: 14px;
-      margin-top: 5px;
-      color: #aaa;
-    }
-  </style>
+<style>
+body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
+.container { max-width:1200px; margin:auto; }
+.card { background:#161616; padding:15px; margin:12px 0; border-radius:10px;}
+.exit { color:red; font-weight:bold;}
+.warning { color:orange;}
+.hold { color:lime;}
+.small { color:#aaa; font-size:13px;}
+.grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
+.group-title { margin-top:20px; font-weight:bold; font-size:16px;}
+</style>
 </head>
 
 <body>
 
-  <div class="box">
-    <div class="label">CORE EXIT INDICATOR</div>
-    <div id="score" class="score">...</div>
-    <div id="status" class="label"></div>
-    <div id="trend" class="trend"></div>
-  </div>
+<div class="container">
 
-  <script>
-    function calculateScore(data) {
-      const soxx = data.soxxChange > 0 ? 1 : -1;
-      const nvda = data.nvdaChange > 5 ? -1 : 1;
-      const vix = data.vix > 25 ? -1 : 0;
-      const oil = data.oil > 95 ? -0.5 : 0;
+<h1>AI Semiconductor EXIT Dashboard</h1>
 
-      return (
-        0.4 * soxx +
-        0.3 * nvda +
-        0.2 * vix +
-        0.1 * oil
-      );
-    }
+<!-- ================= CORE EXIT INDICATOR ================= -->
 
-    function getLabel(score) {
-      if (score > 0.5) return "HOLD (Strong)";
-      if (score > 0) return "HOLD (Late)";
-      if (score >= -0.5) return "WARNING";
-      return "EXIT";
-    }
+<div class="card">
+<h2>CORE Exit Indicator</h2>
+NVDA: <span id="nvda"></span><br>
+SOXX: <span id="soxx"></span><br>
+VIX: <span id="vix"></span><br>
+OIL: <span id="oil"></span><br>
+Updated: <span id="time"></span>
+</div>
 
-    async function loadHistory() {
-      try {
-        const res = await fetch("history.json?t=" + Date.now());
-        return await res.json();
-      } catch {
-        return [];
-      }
-    }
+<div class="card">
+<h3>Final Decision</h3>
+<div id="decision"></div>
+</div>
 
-    function getTrend(history) {
-      if (history.length < 5) return "Trend: N/A";
+<div class="card">
+<h3>CORE Score Breakdown</h3>
+<div id="scoreExplain"></div>
+<div class="small">
+0.4×SOXX + 0.3×NVDA + 0.2×VIX + 0.1×OIL
+</div>
+</div>
 
-      const latest = history[history.length - 1].coreScore;
-      const past = history[history.length - 5].coreScore;
+<!-- ================= AI MACRO MONITOR ================= -->
 
-      if (latest > past) return "Trend: ↑ Improving";
-      if (latest < past) return "Trend: ↓ Weakening";
-      return "Trend: → Flat";
-    }
+<div class="card">
+<h2>AI Macro Indicator Monitor</h2>
+</div>
 
-    async function loadData() {
-      const res = await fetch("data.json?t=" + Date.now());
-      const data = await res.json();
+<div class="card">
+<h3>AI Macro Score</h3>
+<div id="macroScore"></div>
+<div id="macroExplain" class="small" style="margin-top:10px;"></div>
+</div>
 
-      const history = await loadHistory();
+<div class="card">
+<h3>AI Macro Indicators (Details)</h3>
 
-      const score = calculateScore(data);
-      const label = getLabel(score);
-      const trend = getTrend(history);
+<div class="group-title">Hardware Contribution</div>
+<div id="grp_hardware" class="grid"></div>
 
-      document.getElementById("score").innerText = score.toFixed(2);
-      document.getElementById("status").innerText = label;
-      document.getElementById("trend").innerText = trend;
-    }
+<div class="group-title">Hyperscalers Contribution</div>
+<div id="grp_hyperscalers" class="grid"></div>
 
-    loadData();
-  </script>
+<div class="group-title">ETF Contribution</div>
+<div id="grp_etfs" class="grid"></div>
+
+<div class="group-title">Macro / Risk Contribution</div>
+<div id="grp_macro" class="grid"></div>
+</div>
+
+</div>
+
+<script>
+
+/* ================= CORE EXIT SCORE ================= */
+
+async function loadCore(){
+    const d = await (await fetch("data.json?t=" + Date.now())).json();
+
+    const nvdaCh = +d.nvdaChange;
+    const soxxCh = +d.soxxChange;
+    const vix = +d.vix;
+    const oil = +d.oil;
+
+    document.getElementById("nvda").innerText = `${d.nvda} (${nvdaCh.toFixed(2)}%)`;
+    document.getElementById("soxx").innerText = `${d.soxx} (${soxxCh.toFixed(2)}%)`;
+    document.getElementById("vix").innerText = vix;
+    document.getElementById("oil").innerText = oil;
+    document.getElementById("time").innerText = d.updated;
+
+    const soxxSignal = soxxCh > 0 ? 1 : -1;
+    const nvdaSignal = nvdaCh > 5 ? -1 : 1;
+    const vixSignal = vix > 25 ? -1 : 0;
+    const oilSignal = oil > 95 ? -0.5 : 0;
+
+    const score =
+        0.4*soxxSignal + 0.3*nvdaSignal + 0.2*vixSignal + 0.1*oilSignal;
+
+    document.getElementById("decision").innerHTML =
+        score > 0.5 ? `<span class="hold">HOLD (Strong) (${score.toFixed(2)})</span>` :
+        score > 0 ? `<span class="warning">HOLD (Late) (${score.toFixed(2)})</span>` :
+        score > -0.5 ? `<span class="warning">WARNING (${score.toFixed(2)})</span>` :
+        `<span class="exit">EXIT (${score.toFixed(2)})</span>`;
+
+    document.getElementById("scoreExplain").innerHTML =
+        `SOXX: ${(0.4*soxxSignal).toFixed(2)}<br>
+         NVDA: ${(0.3*nvdaSignal).toFixed(2)}<br>
+         VIX: ${(0.2*vixSignal).toFixed(2)}<br>
+         OIL: ${(0.1*oilSignal).toFixed(2)}<br><br>
+         <b>Total CORE Score: ${score.toFixed(2)}</b>`;
+}
+
+/* ================= AI MACRO SCORE ================= */
+
+async function loadAIMacro(){
+    const defs = await (await fetch("ai_macro_indicators.json")).json();
+    const vals = await (await fetch("ai_macro_values.json?t=" + Date.now())).json();
+
+    const groups = {
+        hardware: [],
+        hyperscalers: [],
+        etfs: [],
+        macro: []
+    };
+
+    const tickers = {
+        hardware: [],
+        hyperscalers: [],
+        etfs: [],
+        macro: []
+    };
+
+    defs.forEach(d => {
+        const v = vals.values[d.ticker];
+        if(!v) return;
+
+        const s = v.change > 0 ? 1 : v.change < 0 ? -1 : 0;
+
+        let bucket;
+        if(d.category.includes("Semiconductor") || d.category.includes("GPU") || d.category.includes("CPU"))
+            bucket = "hardware";
+        else if(d.category.includes("Cloud") || d.category.includes("Software"))
+            bucket = "hyperscalers";
+        else if(d.category.includes("ETF"))
+            bucket = "etfs";
+        else
+            bucket = "macro";
+
+        groups[bucket].push(s);
+        tickers[bucket].push(d.ticker);
+
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+            <b>${d.ticker}</b> — ${d.name}<br>
+            ${v.price} (${v.change.toFixed(2)}%)<br>
+            <span class="small">${d.logic}</span>
+        `;
+        document.getElementById("grp_" + bucket).appendChild(div);
+    });
+
+    const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
+
+    const hw = avg(groups.hardware);
+    const hs = avg(groups.hyperscalers);
+    const et = avg(groups.etfs);
+    const ma = avg(groups.macro);
+
+    const macroScore = 0.4*hw + 0.25*hs + 0.2*et + 0.15*ma;
+
+    document.getElementById("macroScore").innerHTML =
+        macroScore > 0.5 ? `<span class="hold">Strong AI Breadth (${macroScore.toFixed(2)})</span>` :
+        macroScore > 0 ? `<span class="warning">Late-cycle AI (${macroScore.toFixed(2)})</span>` :
+        `<span class="exit">Weak / Narrow AI (${macroScore.toFixed(2)})</span>`;
+
+    document.getElementById("macroExplain").innerHTML = `
+<b>Hardware (+${(0.4*hw).toFixed(2)}):</b><br>
+Contributors: [${tickers.hardware.join(", ")}]<br>
+${tickers.hardware.length} indicators → average ${hw.toFixed(2)} × 40%<br><br>
+
+<b>Hyperscalers (+${(0.25*hs).toFixed(2)}):</b><br>
+Contributors: [${tickers.hyperscalers.join(", ")}]<br>
+${tickers.hyperscalers.length} indicators → average ${hs.toFixed(2)} × 25%<br><br>
+
+<b>ETFs (+${(0.2*et).toFixed(2)}):</b><br>
+Contributors: [${tickers.etfs.join(", ")}]<br>
+${tickers.etfs.length} indicators → average ${et.toFixed(2)} × 20%<br><br>
+
+<b>Macro / Risk (+${(0.15*ma).toFixed(2)}):</b><br>
+Contributors: [${tickers.macro.join(", ")}]<br>
+${tickers.macro.length} indicators → average ${ma.toFixed(2)} × 15%<br><br>
+
+<b>Total AI Macro Score: ${macroScore.toFixed(2)}</b><br>
+→ Higher score = broader, healthier AI participation
+`;
+}
+
+loadCore();
+loadAIMacro();
+
+</script>
 
 </body>
 </html>
