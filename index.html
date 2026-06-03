@@ -15,7 +15,6 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 .group-title { margin-top:20px; font-weight:bold; font-size:16px;}
 </style>
 
-<!-- Chart.js for ETF chart -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -23,9 +22,9 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 <div class="container">
 <h1>AI Semiconductor EXIT Dashboard</h1>
 
-<!-- ================= ETF PRICE & POSITION VALUE (VVSM) ================= -->
+<!-- ================= VVSM PRICE & POSITION VALUE ================= -->
 <div class="card">
-  <h2>VanEck Semiconductor UCITS ETF (VVSM) & Your Position</h2>
+  <h2>VanEck Semiconductor UCITS ETF (VVSM) — Your Position</h2>
   <canvas id="smhChart" height="120"></canvas>
   <div id="smhValue" class="small" style="margin-top:10px;"></div>
 </div>
@@ -199,9 +198,7 @@ ${tickers.etfs.length} indicators → average ${et.toFixed(2)} × 20%<br><br>
 Contributors: [${tickers.macro.join(", ")}]<br>
 ${tickers.macro.length} indicators → average ${ma.toFixed(2)} × 15%<br><br>
 
-<b>Total AI Macro Score: ${macroScore.toFixed(2)}</b><br>
-→ Higher score = broader, healthier AI participation
-`;
+<b>Total AI Macro Score: ${macroScore.toFixed(2)}</b>`;
 }
 
 /* ================= VVSM PRICE & POSITION CHART ================= */
@@ -212,13 +209,11 @@ async function loadSMHChart() {
     const shares = data.shares;
     const closes = data.closes;
     const timestamps = data.timestamps.map(t => new Date(t * 1000));
-    const eurusd = data.eurusd;
-    const latestPrice = closes[closes.length - 1];
-    const valueEur = shares * latestPrice * eurusd;
+    const latestPrice = data.latestPriceEUR;
+    const valueEur = data.latestValueEUR;
 
     document.getElementById("smhValue").innerHTML =
-      `Latest VVSM price: €${(latestPrice * eurusd).toFixed(2)} (≈ $${latestPrice.toFixed(2)})<br>
-EUR/USD: ${eurusd.toFixed(4)}<br>
+      `Latest VVSM price: €${latestPrice.toFixed(2)}<br>
 <b>Your position value: €${valueEur.toFixed(2)}</b><br>
 <span class="small">Updated: ${data.updated}</span>`;
 
@@ -228,7 +223,7 @@ EUR/USD: ${eurusd.toFixed(4)}<br>
       data: {
         labels: timestamps.map(t => t.toISOString().split("T")[0]),
         datasets: [{
-          label: "VVSM (VanEck Semiconductor UCITS ETF) price in USD",
+          label: "VVSM (VanEck Semiconductor UCITS ETF) price in EUR",
           data: closes,
           borderColor: "lime",
           borderWidth: 2,
