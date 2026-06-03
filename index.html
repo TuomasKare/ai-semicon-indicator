@@ -22,9 +22,7 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 
 <h1>AI Semiconductor EXIT Dashboard</h1>
 
-<!-- ===================================================== -->
-<!-- CORE EXIT INDICATOR -->
-<!-- ===================================================== -->
+<!-- ================= CORE EXIT INDICATOR ================= -->
 
 <div class="card">
 <h2>CORE Exit Indicator</h2>
@@ -48,42 +46,37 @@ Updated: <span id="time"></span>
 <div class="card">
 <h3>Score Breakdown</h3>
 <div id="scoreExplain"></div>
-<div class="small">
-0.4×SOXX + 0.3×NVDA + 0.2×VIX + 0.1×OIL
-</div>
 </div>
 
-<!-- ===================================================== -->
-<!-- AI MACRO INDICATORS -->
-<!-- ===================================================== -->
+<!-- ================= AI MACRO MONITOR ================= -->
 
 <div class="card">
 <h2>AI Macro Indicator Monitor</h2>
 <div id="aiIndicators" class="grid"></div>
 </div>
 
+<div class="card">
+<h2>AI Macro Score</h2>
+<div id="macroScore"></div>
+<div id="macroBreakdown" class="small"></div>
+</div>
+
 </div>
 
 <script>
 
-/* =====================================================
-   CORE EXIT INDICATOR (data.json)
-===================================================== */
+/* ================= CORE EXIT SCORE ================= */
 
 async function loadCore(){
+    const d = await (await fetch("data.json?t=" + Date.now())).json();
 
-    const res = await fetch("data.json?t=" + Date.now());
-    const d = await res.json();
+    const nvdaCh = +d.nvdaChange;
+    const soxxCh = +d.soxxChange;
+    const vix = +d.vix;
+    const oil = +d.oil;
 
-    const nvda = parseFloat(d.nvda);
-    const soxx = parseFloat(d.soxx);
-    const nvdaCh = parseFloat(d.nvdaChange);
-    const soxxCh = parseFloat(d.soxxChange);
-    const vix = parseFloat(d.vix);
-    const oil = parseFloat(d.oil);
-
-    document.getElementById("nvda").innerText = nvda + " (" + nvdaCh.toFixed(2) + "%)";
-    document.getElementById("soxx").innerText = soxx + " (" + soxxCh.toFixed(2) + "%)";
+    document.getElementById("nvda").innerText = `${d.nvda} (${nvdaCh.toFixed(2)}%)`;
+    document.getElementById("soxx").innerText = `${d.soxx} (${soxxCh.toFixed(2)}%)`;
     document.getElementById("vix").innerText = vix;
     document.getElementById("oil").innerText = oil;
     document.getElementById("time").innerText = d.updated;
@@ -94,79 +87,76 @@ async function loadCore(){
     const oilSignal = oil > 95 ? -0.5 : 0;
 
     const score =
-        0.4 * soxxSignal +
-        0.3 * nvdaSignal +
-        0.2 * vixSignal +
-        0.1 * oilSignal;
-
-    let signals = [];
-    if(nvdaSignal === -1) signals.push("AI overheating (NVDA)");
-    if(soxxSignal === -1) signals.push("Semiconductors weakening");
-    if(vixSignal === -1) signals.push("Market risk rising (VIX)");
-    if(oilSignal < 0) signals.push("Geopolitical stress");
-
-    document.getElementById("signals").innerHTML =
-        signals.length ? signals.join("<br>") : "No major warning signals";
-
-    let decision, cls;
-    if(score < -0.5){ decision="EXIT"; cls="exit"; }
-    else if(score < 0){ decision="WARNING"; cls="warning"; }
-    else if(score < 0.5){ decision="HOLD (Late Cycle)"; cls="warning"; }
-    else { decision="HOLD (Strong)"; cls="hold"; }
+        0.4*soxxSignal + 0.3*nvdaSignal + 0.2*vixSignal + 0.1*oilSignal;
 
     document.getElementById("decision").innerHTML =
-        `<span class="${cls}">${decision} (score ${score.toFixed(2)})</span>`;
-
-    document.getElementById("scoreExplain").innerHTML =
-        `SOXX: ${(0.4*soxxSignal).toFixed(2)}<br>
-         NVDA: ${(0.3*nvdaSignal).toFixed(2)}<br>
-         VIX: ${(0.2*vixSignal).toFixed(2)}<br>
-         OIL: ${(0.1*oilSignal).toFixed(2)}<br><br>
-         <b>Total: ${score.toFixed(2)}</b>`;
+        score > 0.5 ? `<span class="hold">HOLD (Strong) (${score.toFixed(2)})</span>` :
+        score > 0 ? `<span class="warning">HOLD (Late) (${score.toFixed(2)})</span>` :
+        score > -0.5 ? `<span class="warning">WARNING (${score.toFixed(2)})</span>` :
+        `<span class="exit">EXIT (${score.toFixed(2)})</span>`;
 }
 
-/* =====================================================
-   AI MACRO INDICATORS (definitions + values)
-===================================================== */
+/* ================= AI MACRO SCORE ================= */
 
 async function loadAIMacro(){
+    const defs = await (await fetch("ai_macro_indicators.json")).json();
+    const vals = await (await fetch("ai_macro_values.json?t=" + Date.now())).json();
 
-    const defRes = await fetch("ai_macro_indicators.json");
-    const defs = await defRes.json();
+    const groups = {
+        hardware: [],
+        hyperscalers: [],
+        etfs: [],
+        macro: []
+    };
 
-    const valRes = await fetch("ai_macro_values.json?t=" + Date.now());
-    const vals = await valRes.json();
-
-    const container = document.getElementById("aiIndicators");
-    container.innerHTML = "";
-
-    defs.forEach(item => {
-
-        const v = vals.values[item.ticker];
+    defs.forEach(d => {
+        const v = vals.values[d.ticker];
         if(!v) return;
+
+        const score = v.change > 0 ? 1 : v.change < 0 ? -1 : 0;
+
+        if(d.category.includes("Semiconductor") || d.category.includes("AI / GPU"))
+            groups.hardware.push(score);
+        else if(d.category.includes("Cloud") || d.category.includes("Software"))
+            groups.hyperscalers.push(score);
+        else if(d.category.includes("ETF"))
+            groups.etfs.push(score);
+        else
+            groups.macro.push(score);
 
         const div = document.createElement("div");
         div.className = "card";
-
-        const changeColor = v.change >= 0 ? "lime" : "orange";
-
         div.innerHTML = `
-            <b>${item.ticker}</b> — ${item.name}<br>
-            <span style="color:${changeColor}">
-                ${v.price} (${v.change.toFixed(2)}%)
-            </span><br>
-            <span class="small">
-                ${item.category}<br>
-                Metric: ${item.evaluate_metric}<br>
-                ${item.logic}
-            </span>
+            <b>${d.ticker}</b><br>
+            ${v.price} (${v.change.toFixed(2)}%)<br>
+            <span class="small">${d.category}</span>
         `;
-
-        container.appendChild(div);
+        document.getElementById("aiIndicators").appendChild(div);
     });
-}
 
-/* ===================================================== */
+    const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+
+    const hw = avg(groups.hardware);
+    const hs = avg(groups.hyperscalers);
+    const et = avg(groups.etfs);
+    const ma = avg(groups.macro);
+
+    const macroScore =
+        0.4*hw + 0.25*hs + 0.2*et + 0.15*ma;
+
+    document.getElementById("macroScore").innerHTML =
+        macroScore > 0.5 ? `<span class="hold">Strong AI Breadth (${macroScore.toFixed(2)})</span>` :
+        macroScore > 0 ? `<span class="warning">Late AI Cycle (${macroScore.toFixed(2)})</span>` :
+        `<span class="exit">Weak / Narrow AI (${macroScore.toFixed(2)})</span>`;
+
+    document.getElementById("macroBreakdown").innerHTML = `
+        Hardware: ${(0.4*hw).toFixed(2)}<br>
+        Hyperscalers: ${(0.25*hs).toFixed(2)}<br>
+        ETFs: ${(0.2*et).toFixed(2)}<br>
+        Macro: ${(0.15*ma).toFixed(2)}<br><br>
+        <b>Total Macro Score: ${macroScore.toFixed(2)}</b>
+    `;
+}
 
 loadCore();
 loadAIMacro();
