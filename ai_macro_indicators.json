@@ -41,41 +41,43 @@
     "evaluate_metric": "Ad Impression Yield / CapEx",
     "logic": "Represents open-source AI infrastructure deployment (Llama) and AI-driven ad-targeting optimization."
   },
+
   {
     "ticker": "THNQ",
     "name": "ROBO Global AI ETF",
-    "category": "AI Pure-Play Software",
+    "category": "ETF / AI Pure-Play Software",
     "evaluate_metric": "Closing Price Momentum",
     "logic": "A diversified thematic basket tracking pure-play software, data infrastructure, and service layers of the AI economy."
   },
   {
     "ticker": "BOTZ",
     "name": "Global X Robotics & AI ETF",
-    "category": "AI / Robotics",
+    "category": "ETF / Robotics",
     "evaluate_metric": "Net Asset Value (NAV)",
     "logic": "Monitors global trends in physical automation, industrial robotics, and computer vision integration."
   },
   {
     "ticker": "SMH",
     "name": "VanEck Semiconductor ETF",
-    "category": "Semiconductor Benchmark",
+    "category": "ETF / Semiconductor Benchmark",
     "evaluate_metric": "Volume / Trend Relative to S&P 500",
     "logic": "The premier institutional benchmark used to gauge the macroeconomic momentum, liquidity, and trading velocity of the global chip sector."
   },
   {
     "ticker": "SOXX",
     "name": "iShares Semiconductor ETF",
-    "category": "Semiconductor Macro",
+    "category": "ETF / Semiconductor Macro",
     "evaluate_metric": "200-Day Moving Average",
     "logic": "Tracks a market-cap-weighted index of the 30 largest US-listed chip designers and fabricators."
   },
   {
     "ticker": "XSD",
     "name": "SPDR S&P Semiconductor ETF",
-    "category": "Semiconductor Equal-Weight",
+    "category": "ETF / Semiconductor Equal-Weight",
     "evaluate_metric": "Price Deviations from SMH",
     "logic": "Equal-weighted index that highlights the financial health of small-to-mid-cap specialty chip design firms over tech giants."
   },
+
   {
     "ticker": "TSM",
     "name": "Taiwan Semiconductor Manufacturing",
@@ -146,6 +148,7 @@
     "evaluate_metric": "Consumer Hardware Gross Margins",
     "logic": "Tracks the closed-ecosystem deployment of advanced proprietary M-series and A-series silicon, serving as a high-end consumer hardware proxy."
   },
+
   {
     "ticker": "^VIX",
     "name": "CBOE Volatility Index",
