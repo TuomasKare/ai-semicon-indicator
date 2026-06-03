@@ -15,7 +15,7 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 .group-title { margin-top:20px; font-weight:bold; font-size:16px;}
 </style>
 
-<!-- Chart.js for SMH chart -->
+<!-- Chart.js for ETF chart -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -23,9 +23,9 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 <div class="container">
 <h1>AI Semiconductor EXIT Dashboard</h1>
 
-<!-- ================= SMH PRICE & POSITION VALUE ================= -->
+<!-- ================= ETF PRICE & POSITION VALUE (VVSM) ================= -->
 <div class="card">
-  <h2>SMH Price & Your Position Value</h2>
+  <h2>VanEck Semiconductor UCITS ETF (VVSM) & Your Position</h2>
   <canvas id="smhChart" height="120"></canvas>
   <div id="smhValue" class="small" style="margin-top:10px;"></div>
 </div>
@@ -204,7 +204,7 @@ ${tickers.macro.length} indicators → average ${ma.toFixed(2)} × 15%<br><br>
 `;
 }
 
-/* ================= SMH PRICE & POSITION CHART ================= */
+/* ================= VVSM PRICE & POSITION CHART ================= */
 async function loadSMHChart() {
   try {
     const data = await (await fetch("smh.json?t=" + Date.now())).json();
@@ -217,7 +217,7 @@ async function loadSMHChart() {
     const valueEur = shares * latestPrice * eurusd;
 
     document.getElementById("smhValue").innerHTML =
-      `Latest SMH price: $${latestPrice.toFixed(2)}<br>
+      `Latest VVSM price: €${(latestPrice * eurusd).toFixed(2)} (≈ $${latestPrice.toFixed(2)})<br>
 EUR/USD: ${eurusd.toFixed(4)}<br>
 <b>Your position value: €${valueEur.toFixed(2)}</b><br>
 <span class="small">Updated: ${data.updated}</span>`;
@@ -228,7 +228,7 @@ EUR/USD: ${eurusd.toFixed(4)}<br>
       data: {
         labels: timestamps.map(t => t.toISOString().split("T")[0]),
         datasets: [{
-          label: "SMH Price (USD)",
+          label: "VVSM (VanEck Semiconductor UCITS ETF) price in USD",
           data: closes,
           borderColor: "lime",
           borderWidth: 2,
@@ -254,7 +254,7 @@ EUR/USD: ${eurusd.toFixed(4)}<br>
     });
   } catch (e) {
     document.getElementById("smhValue").innerHTML =
-      "SMH data not available. Run update_smh.js to generate smh.json.";
+      "VVSM data not available. Run update_smh.js to generate smh.json.";
   }
 }
 
