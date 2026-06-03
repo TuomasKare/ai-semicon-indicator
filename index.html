@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>AI Semiconductor EXIT Dashboard</title>
-
 <style>
 body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 .container { max-width:1200px; margin:auto; }
@@ -15,16 +14,23 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 .grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
 .group-title { margin-top:20px; font-weight:bold; font-size:16px;}
 </style>
+
+<!-- Chart.js for SMH chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-
 <div class="container">
-
 <h1>AI Semiconductor EXIT Dashboard</h1>
 
-<!-- ================= CORE EXIT INDICATOR ================= -->
+<!-- ================= SMH PRICE & POSITION VALUE ================= -->
+<div class="card">
+  <h2>SMH Price & Your Position Value</h2>
+  <canvas id="smhChart" height="120"></canvas>
+  <div id="smhValue" class="small" style="margin-top:10px;"></div>
+</div>
 
+<!-- ================= CORE EXIT INDICATOR ================= -->
 <div class="card">
 <h2>CORE Exit Indicator</h2>
 NVDA: <span id="nvda"></span><br>
@@ -48,7 +54,6 @@ Updated: <span id="time"></span>
 </div>
 
 <!-- ================= AI MACRO MONITOR ================= -->
-
 <div class="card">
 <h2>AI Macro Indicator Monitor</h2>
 </div>
@@ -78,109 +83,106 @@ Updated: <span id="time"></span>
 </div>
 
 <script>
-
 /* ================= CORE EXIT SCORE ================= */
-
 async function loadCore(){
-    const d = await (await fetch("data.json?t=" + Date.now())).json();
+  const d = await (await fetch("data.json?t=" + Date.now())).json();
 
-    const nvdaCh = +d.nvdaChange;
-    const soxxCh = +d.soxxChange;
-    const vix = +d.vix;
-    const oil = +d.oil;
+  const nvdaCh = +d.nvdaChange;
+  const soxxCh = +d.soxxChange;
+  const vix = +d.vix;
+  const oil = +d.oil;
 
-    document.getElementById("nvda").innerText = `${d.nvda} (${nvdaCh.toFixed(2)}%)`;
-    document.getElementById("soxx").innerText = `${d.soxx} (${soxxCh.toFixed(2)}%)`;
-    document.getElementById("vix").innerText = vix;
-    document.getElementById("oil").innerText = oil;
-    document.getElementById("time").innerText = d.updated;
+  document.getElementById("nvda").innerText = `${d.nvda} (${nvdaCh.toFixed(2)}%)`;
+  document.getElementById("soxx").innerText = `${d.soxx} (${soxxCh.toFixed(2)}%)`;
+  document.getElementById("vix").innerText = vix;
+  document.getElementById("oil").innerText = oil;
+  document.getElementById("time").innerText = d.updated;
 
-    const soxxSignal = soxxCh > 0 ? 1 : -1;
-    const nvdaSignal = nvdaCh > 5 ? -1 : 1;
-    const vixSignal = vix > 25 ? -1 : 0;
-    const oilSignal = oil > 95 ? -0.5 : 0;
+  const soxxSignal = soxxCh > 0 ? 1 : -1;
+  const nvdaSignal = nvdaCh > 5 ? -1 : 1;
+  const vixSignal = vix > 25 ? -1 : 0;
+  const oilSignal = oil > 95 ? -0.5 : 0;
 
-    const score =
-        0.4*soxxSignal + 0.3*nvdaSignal + 0.2*vixSignal + 0.1*oilSignal;
+  const score =
+    0.4*soxxSignal + 0.3*nvdaSignal + 0.2*vixSignal + 0.1*oilSignal;
 
-    document.getElementById("decision").innerHTML =
-        score > 0.5 ? `<span class="hold">HOLD (Strong) (${score.toFixed(2)})</span>` :
-        score > 0 ? `<span class="warning">HOLD (Late) (${score.toFixed(2)})</span>` :
-        score > -0.5 ? `<span class="warning">WARNING (${score.toFixed(2)})</span>` :
-        `<span class="exit">EXIT (${score.toFixed(2)})</span>`;
+  document.getElementById("decision").innerHTML =
+    score > 0.5 ? `<span class="hold">HOLD (Strong) (${score.toFixed(2)})</span>` :
+    score > 0 ? `<span class="warning">HOLD (Late) (${score.toFixed(2)})</span>` :
+    score > -0.5 ? `<span class="warning">WARNING (${score.toFixed(2)})</span>` :
+    `<span class="exit">EXIT (${score.toFixed(2)})</span>`;
 
-    document.getElementById("scoreExplain").innerHTML =
-        `SOXX: ${(0.4*soxxSignal).toFixed(2)}<br>
-         NVDA: ${(0.3*nvdaSignal).toFixed(2)}<br>
-         VIX: ${(0.2*vixSignal).toFixed(2)}<br>
-         OIL: ${(0.1*oilSignal).toFixed(2)}<br><br>
-         <b>Total CORE Score: ${score.toFixed(2)}</b>`;
+  document.getElementById("scoreExplain").innerHTML =
+    `SOXX: ${(0.4*soxxSignal).toFixed(2)}<br>
+NVDA: ${(0.3*nvdaSignal).toFixed(2)}<br>
+VIX: ${(0.2*vixSignal).toFixed(2)}<br>
+OIL: ${(0.1*oilSignal).toFixed(2)}<br><br>
+<b>Total CORE Score: ${score.toFixed(2)}</b>`;
 }
 
 /* ================= AI MACRO SCORE ================= */
-
 async function loadAIMacro(){
-    const defs = await (await fetch("ai_macro_indicators.json")).json();
-    const vals = await (await fetch("ai_macro_values.json?t=" + Date.now())).json();
+  const defs = await (await fetch("ai_macro_indicators.json")).json();
+  const vals = await (await fetch("ai_macro_values.json?t=" + Date.now())).json();
 
-    const groups = {
-        hardware: [],
-        hyperscalers: [],
-        etfs: [],
-        macro: []
-    };
+  const groups = {
+    hardware: [],
+    hyperscalers: [],
+    etfs: [],
+    macro: []
+  };
 
-    const tickers = {
-        hardware: [],
-        hyperscalers: [],
-        etfs: [],
-        macro: []
-    };
+  const tickers = {
+    hardware: [],
+    hyperscalers: [],
+    etfs: [],
+    macro: []
+  };
 
-    defs.forEach(d => {
-        const v = vals.values[d.ticker];
-        if(!v) return;
+  defs.forEach(d => {
+    const v = vals.values[d.ticker];
+    if(!v) return;
 
-        const s = v.change > 0 ? 1 : v.change < 0 ? -1 : 0;
+    const s = v.change > 0 ? 1 : v.change < 0 ? -1 : 0;
 
-        let bucket;
-        if(d.category.includes("Semiconductor") || d.category.includes("GPU") || d.category.includes("CPU"))
-            bucket = "hardware";
-        else if(d.category.includes("Cloud") || d.category.includes("Software"))
-            bucket = "hyperscalers";
-        else if(d.category.includes("ETF"))
-            bucket = "etfs";
-        else
-            bucket = "macro";
+    let bucket;
+    if(d.category.includes("Semiconductor") || d.category.includes("GPU") || d.category.includes("CPU"))
+      bucket = "hardware";
+    else if(d.category.includes("Cloud") || d.category.includes("Software"))
+      bucket = "hyperscalers";
+    else if(d.category.includes("ETF"))
+      bucket = "etfs";
+    else
+      bucket = "macro";
 
-        groups[bucket].push(s);
-        tickers[bucket].push(d.ticker);
+    groups[bucket].push(s);
+    tickers[bucket].push(d.ticker);
 
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
-            <b>${d.ticker}</b> — ${d.name}<br>
-            ${v.price} (${v.change.toFixed(2)}%)<br>
-            <span class="small">${d.logic}</span>
-        `;
-        document.getElementById("grp_" + bucket).appendChild(div);
-    });
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+<b>${d.ticker}</b> — ${d.name}<br>
+${v.price} (${v.change.toFixed(2)}%)<br>
+<span class="small">${d.logic}</span>
+`;
+    document.getElementById("grp_" + bucket).appendChild(div);
+  });
 
-    const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
+  const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
 
-    const hw = avg(groups.hardware);
-    const hs = avg(groups.hyperscalers);
-    const et = avg(groups.etfs);
-    const ma = avg(groups.macro);
+  const hw = avg(groups.hardware);
+  const hs = avg(groups.hyperscalers);
+  const et = avg(groups.etfs);
+  const ma = avg(groups.macro);
 
-    const macroScore = 0.4*hw + 0.25*hs + 0.2*et + 0.15*ma;
+  const macroScore = 0.4*hw + 0.25*hs + 0.2*et + 0.15*ma;
 
-    document.getElementById("macroScore").innerHTML =
-        macroScore > 0.5 ? `<span class="hold">Strong AI Breadth (${macroScore.toFixed(2)})</span>` :
-        macroScore > 0 ? `<span class="warning">Late-cycle AI (${macroScore.toFixed(2)})</span>` :
-        `<span class="exit">Weak / Narrow AI (${macroScore.toFixed(2)})</span>`;
+  document.getElementById("macroScore").innerHTML =
+    macroScore > 0.5 ? `<span class="hold">Strong AI Breadth (${macroScore.toFixed(2)})</span>` :
+    macroScore > 0 ? `<span class="warning">Late-cycle AI (${macroScore.toFixed(2)})</span>` :
+    `<span class="exit">Weak / Narrow AI (${macroScore.toFixed(2)})</span>`;
 
-    document.getElementById("macroExplain").innerHTML = `
+  document.getElementById("macroExplain").innerHTML = `
 <b>Hardware (+${(0.4*hw).toFixed(2)}):</b><br>
 Contributors: [${tickers.hardware.join(", ")}]<br>
 ${tickers.hardware.length} indicators → average ${hw.toFixed(2)} × 40%<br><br>
@@ -202,9 +204,63 @@ ${tickers.macro.length} indicators → average ${ma.toFixed(2)} × 15%<br><br>
 `;
 }
 
+/* ================= SMH PRICE & POSITION CHART ================= */
+async function loadSMHChart() {
+  try {
+    const data = await (await fetch("smh.json?t=" + Date.now())).json();
+
+    const shares = data.shares;
+    const closes = data.closes;
+    const timestamps = data.timestamps.map(t => new Date(t * 1000));
+    const eurusd = data.eurusd;
+    const latestPrice = closes[closes.length - 1];
+    const valueEur = shares * latestPrice * eurusd;
+
+    document.getElementById("smhValue").innerHTML =
+      `Latest SMH price: $${latestPrice.toFixed(2)}<br>
+EUR/USD: ${eurusd.toFixed(4)}<br>
+<b>Your position value: €${valueEur.toFixed(2)}</b><br>
+<span class="small">Updated: ${data.updated}</span>`;
+
+    const ctx = document.getElementById("smhChart").getContext("2d");
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: timestamps.map(t => t.toISOString().split("T")[0]),
+        datasets: [{
+          label: "SMH Price (USD)",
+          data: closes,
+          borderColor: "lime",
+          borderWidth: 2,
+          tension: 0.2,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { labels: { color: "#eee" } }
+        },
+        scales: {
+          x: {
+            ticks: { color: "#aaa" },
+            grid: { color: "#333" }
+          },
+          y: {
+            ticks: { color: "#aaa" },
+            grid: { color: "#333" }
+          }
+        }
+      }
+    });
+  } catch (e) {
+    document.getElementById("smhValue").innerHTML =
+      "SMH data not available. Run update_smh.js to generate smh.json.";
+  }
+}
+
 loadCore();
 loadAIMacro();
-
+loadSMHChart();
 </script>
 
 </body>
