@@ -52,35 +52,20 @@ Updated: <span id="time"></span>
 </div>
 </div>
 
-<!-- ================= NEW: EXPLANATION OF CORE SCORE ================= -->
+<!-- ================= CORE EXPLANATION ================= -->
 <div class="card">
 <h3>How the CORE Score Works</h3>
 <div class="small">
-<b>SOXX (40% weight):</b> Measures the strength of the semiconductor sector as a whole.  
-Positive = broad chip‑sector strength.  
-Negative = sector weakness → early warning signal.<br><br>
+<b>SOXX (40% weight):</b> Measures broad semiconductor sector strength.<br>
+<b>NVDA (30% weight):</b> Tracks the AI cycle leader. A drop >5% flips negative.<br>
+<b>VIX (20% weight):</b> Market fear index. Above 25 = risk-off.<br>
+<b>OIL (10% weight):</b> Proxy for geopolitical tension. Above 95 = negative.<br><br>
 
-<b>NVDA (30% weight):</b> The single most important AI‑infrastructure leader.  
-Strong NVDA = strong AI cycle.  
-A drop larger than −5% flips NVDA to a negative signal.<br><br>
-
-<b>VIX (20% weight):</b> Market fear index.  
-Below 20 = calm markets (neutral/positive).  
-Above 25 = risk-off environment → negative pressure on AI stocks.<br><br>
-
-<b>OIL (10% weight):</b> Proxy for geopolitical tension and inflation pressure.  
-Above $95 = rising macro risk → small negative drag.<br><br>
-
-<b>Final CORE Score:</b>  
-The weighted sum of all four signals.  
-Higher score = safer to HOLD.  
-Lower score = rising risk → WARNING or EXIT.<br><br>
-
-<b>Decision thresholds:</b><br>
-<span class="hold">HOLD (Strong): score > 0.50</span><br>
-<span class="warning">HOLD (Late): 0.00 < score ≤ 0.50</span><br>
-<span class="warning">WARNING: −0.50 < score ≤ 0.00</span><br>
-<span class="exit">EXIT: score ≤ −0.50</span>
+<b>Final Score:</b> Weighted sum of all signals.<br>
+<b>HOLD:</b> score > 0.5<br>
+<b>LATE HOLD:</b> 0–0.5<br>
+<b>WARNING:</b> −0.5–0<br>
+<b>EXIT:</b> ≤ −0.5
 </div>
 </div>
 
@@ -95,6 +80,31 @@ Lower score = rising risk → WARNING or EXIT.<br><br>
 <div id="macroExplain" class="small" style="margin-top:10px;"></div>
 </div>
 
+<!-- ================= AI MACRO EXPLANATION ================= -->
+<div class="card">
+<h3>How the AI Macro Score Works</h3>
+<div class="small">
+<b>Hardware (45% weight):</b><br>
+Tracks the physical AI infrastructure layer — GPUs, CPUs, memory, foundries, and semiconductor equipment.<br>
+Positive hardware = strong AI demand and healthy supply chain.<br><br>
+
+<b>Hyperscalers (30% weight):</b><br>
+Measures cloud AI adoption (MSFT, GOOGL, AMZN) and software AI monetization.<br>
+Negative hyperscalers = slowing enterprise AI spending.<br><br>
+
+<b>Macro / Risk (25% weight):</b><br>
+Includes volatility (VIX), energy (OIL), trade (BDRY, FXI), defense (ITA), gold (GLD), crypto (BTC), and rates (TNX).<br>
+Positive macro = stable environment for AI growth.<br>
+Negative macro = geopolitical or liquidity stress.<br><br>
+
+<b>Final AI Macro Score:</b><br>
+Weighted average of all three groups.<br>
+<b>Strong AI:</b> > 0.5<br>
+<b>Late-cycle AI:</b> 0–0.5<br>
+<b>Weak AI:</b> < 0
+</div>
+</div>
+
 <div class="card">
 <h3>AI Macro Indicators (Details)</h3>
 
@@ -103,9 +113,6 @@ Lower score = rising risk → WARNING or EXIT.<br><br>
 
 <div class="group-title">Hyperscalers Contribution</div>
 <div id="grp_hyperscalers" class="grid"></div>
-
-<div class="group-title">ETF Contribution</div>
-<div id="grp_etfs" class="grid"></div>
 
 <div class="group-title">Macro / Risk Contribution</div>
 <div id="grp_macro" class="grid"></div>
@@ -159,14 +166,12 @@ async function loadAIMacro(){
   const groups = {
     hardware: [],
     hyperscalers: [],
-    etfs: [],
     macro: []
   };
 
   const tickers = {
     hardware: [],
     hyperscalers: [],
-    etfs: [],
     macro: []
   };
 
@@ -181,8 +186,6 @@ async function loadAIMacro(){
       bucket = "hardware";
     else if(d.category.includes("Cloud") || d.category.includes("Software"))
       bucket = "hyperscalers";
-    else if(d.category.includes("ETF"))
-      bucket = "etfs";
     else
       bucket = "macro";
 
@@ -203,32 +206,27 @@ ${v.price} (${v.change.toFixed(2)}%)<br>
 
   const hw = avg(groups.hardware);
   const hs = avg(groups.hyperscalers);
-  const et = avg(groups.etfs);
   const ma = avg(groups.macro);
 
-  const macroScore = 0.4*hw + 0.25*hs + 0.2*et + 0.15*ma;
+  const macroScore = 0.45*hw + 0.30*hs + 0.25*ma;
 
   document.getElementById("macroScore").innerHTML =
-    macroScore > 0.5 ? `<span class="hold">Strong AI Breadth (${macroScore.toFixed(2)})</span>` :
+    macroScore > 0.5 ? `<span class="hold">Strong AI (${macroScore.toFixed(2)})</span>` :
     macroScore > 0 ? `<span class="warning">Late-cycle AI (${macroScore.toFixed(2)})</span>` :
-    `<span class="exit">Weak / Narrow AI (${macroScore.toFixed(2)})</span>`;
+    `<span class="exit">Weak AI (${macroScore.toFixed(2)})</span>`;
 
   document.getElementById("macroExplain").innerHTML = `
-<b>Hardware (+${(0.4*hw).toFixed(2)}):</b><br>
+<b>Hardware (+${(0.45*hw).toFixed(2)}):</b><br>
 Contributors: [${tickers.hardware.join(", ")}]<br>
-${tickers.hardware.length} indicators → average ${hw.toFixed(2)} × 40%<br><br>
+${tickers.hardware.length} indicators → avg ${hw.toFixed(2)} × 45%<br><br>
 
-<b>Hyperscalers (+${(0.25*hs).toFixed(2)}):</b><br>
+<b>Hyperscalers (+${(0.30*hs).toFixed(2)}):</b><br>
 Contributors: [${tickers.hyperscalers.join(", ")}]<br>
-${tickers.hyperscalers.length} indicators → average ${hs.toFixed(2)} × 25%<br><br>
+${tickers.hyperscalers.length} indicators → avg ${hs.toFixed(2)} × 30%<br><br>
 
-<b>ETFs (+${(0.2*et).toFixed(2)}):</b><br>
-Contributors: [${tickers.etfs.join(", ")}]<br>
-${tickers.etfs.length} indicators → average ${et.toFixed(2)} × 20%<br><br>
-
-<b>Macro / Risk (+${(0.15*ma).toFixed(2)}):</b><br>
+<b>Macro / Risk (+${(0.25*ma).toFixed(2)}):</b><br>
 Contributors: [${tickers.macro.join(", ")}]<br>
-${tickers.macro.length} indicators → average ${ma.toFixed(2)} × 15%<br><br>
+${tickers.macro.length} indicators → avg ${ma.toFixed(2)} × 25%<br><br>
 
 <b>Total AI Macro Score: ${macroScore.toFixed(2)}</b>`;
 }
