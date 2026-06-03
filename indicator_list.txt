@@ -1,0 +1,25 @@
+AI SECTOR
+1. The Infrastructure & Chip Layer (Hardware Proxies)Hardware is the most direct indicator of AI market health. 
+These companies report capital expenditures and revenues directly tied to AI data center builds.
+
+NVDA (NVIDIA Corp): The ultimate proxy for AI chip demand and graphic processing units (GPUs).
+AVGO (Broadcom Inc): Tracks custom AI application-specific integrated circuit (ASIC) chips and networking hardware.
+AMD (Advanced Micro Devices): Tracks the secondary market for AI accelerators and competitive chip pricing.
+SMCI (Super Micro Computer): Represents the demand for liquid-cooled AI server racks and hardware integration.
+
+2. The Cloud Hyperscaler Layer (Software & CapEx Proxies)These companies build the large language models (LLMs) and host the cloud platforms where enterprise AI runs. Their quarterly capital expenditures (CapEx) dictate the health of the entire AI supply chain.
+
+MSFT (Microsoft Corp): Tracks commercial enterprise AI adoption via Copilot and Azure's partnership with OpenAI.
+GOOGL (Alphabet Inc): Tracks institutional AI research, consumer AI tools (Gemini), and Google Cloud deployment.
+AMZN (Amazon.com Inc): Tracks AWS cloud infrastructure scaling and enterprise AI application hosting.
+META (Meta Platforms): Tracks open-source model development (Llama) and AI-driven digital advertising optimization.
+
+3. The Pure-Play AI ETFs (Thematic Market Indicators)Instead of tracking single stocks, you can fetch thematic Exchange Traded Funds (ETFs) to get an automated, diversified view of the entire AI industry's market capitalization.
+
+BOTZ (Global X Robotics & Artificial Intelligence ETF): Tracks global companies involved in industrial robotics and AI development.
+THNQ (ROBO Global Artificial Intelligence ETF): Focuses heavily on the computing, data, and services layer of AI software.
+AIQ (Global X Artificial Intelligence & Technology ETF): Tracks large-cap tech companies utilizing AI across consumer platforms.
+SOXX (iShares Semiconductor ETF): While not purely AI, it tracks the global semiconductor industry, which is the foundational bottle-neck for all AI computing.
+
+
+
