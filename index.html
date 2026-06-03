@@ -13,6 +13,7 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 .hold { color:lime;}
 .small { color:#aaa; font-size:13px;}
 .grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
+.group-title { margin-top:20px; font-weight:bold; font-size:16px;}
 </style>
 </head>
 
@@ -34,17 +35,12 @@ Updated: <span id="time"></span>
 </div>
 
 <div class="card">
-<h3>Core Signals</h3>
-<div id="signals"></div>
-</div>
-
-<div class="card">
 <h3>Final Decision</h3>
 <div id="decision"></div>
 </div>
 
 <div class="card">
-<h3>Score Breakdown</h3>
+<h3>CORE Score Breakdown</h3>
 <div id="scoreExplain"></div>
 <div class="small">
 0.4×SOXX + 0.3×NVDA + 0.2×VIX + 0.1×OIL
@@ -57,19 +53,26 @@ Updated: <span id="time"></span>
 <h2>AI Macro Indicator Monitor</h2>
 </div>
 
-<!-- === AI MACRO SCORE (MOVED HERE) === -->
-
 <div class="card">
 <h3>AI Macro Score</h3>
 <div id="macroScore"></div>
-<div id="macroBreakdown" class="small"></div>
+<div id="macroExplain" class="small" style="margin-top:10px;"></div>
 </div>
-
-<!-- === AI MACRO INDICATORS WITH EXPLANATIONS === -->
 
 <div class="card">
 <h3>AI Macro Indicators (Details)</h3>
-<div id="aiIndicators" class="grid"></div>
+
+<div class="group-title">Hardware Contribution</div>
+<div id="grp_hardware" class="grid"></div>
+
+<div class="group-title">Hyperscalers Contribution</div>
+<div id="grp_hyperscalers" class="grid"></div>
+
+<div class="group-title">ETF Contribution</div>
+<div id="grp_etfs" class="grid"></div>
+
+<div class="group-title">Macro / Risk Contribution</div>
+<div id="grp_macro" class="grid"></div>
 </div>
 
 </div>
@@ -111,10 +114,10 @@ async function loadCore(){
          NVDA: ${(0.3*nvdaSignal).toFixed(2)}<br>
          VIX: ${(0.2*vixSignal).toFixed(2)}<br>
          OIL: ${(0.1*oilSignal).toFixed(2)}<br><br>
-         <b>Total: ${score.toFixed(2)}</b>`;
+         <b>Total CORE Score: ${score.toFixed(2)}</b>`;
 }
 
-/* ================= AI MACRO SCORE + DETAILS ================= */
+/* ================= AI MACRO SCORE ================= */
 
 async function loadAIMacro(){
     const defs = await (await fetch("ai_macro_indicators.json")).json();
@@ -127,8 +130,12 @@ async function loadAIMacro(){
         macro: []
     };
 
-    const container = document.getElementById("aiIndicators");
-    container.innerHTML = "";
+    const tickers = {
+        hardware: [],
+        hyperscalers: [],
+        etfs: [],
+        macro: []
+    };
 
     defs.forEach(d => {
         const v = vals.values[d.ticker];
@@ -136,31 +143,27 @@ async function loadAIMacro(){
 
         const s = v.change > 0 ? 1 : v.change < 0 ? -1 : 0;
 
+        let bucket;
         if(d.category.includes("Semiconductor") || d.category.includes("GPU") || d.category.includes("CPU"))
-            groups.hardware.push(s);
+            bucket = "hardware";
         else if(d.category.includes("Cloud") || d.category.includes("Software"))
-            groups.hyperscalers.push(s);
+            bucket = "hyperscalers";
         else if(d.category.includes("ETF"))
-            groups.etfs.push(s);
+            bucket = "etfs";
         else
-            groups.macro.push(s);
+            bucket = "macro";
 
-        const color = v.change >= 0 ? "lime" : "orange";
+        groups[bucket].push(s);
+        tickers[bucket].push(d.ticker);
 
         const div = document.createElement("div");
         div.className = "card";
         div.innerHTML = `
             <b>${d.ticker}</b> — ${d.name}<br>
-            <span style="color:${color}">
-                ${v.price} (${v.change.toFixed(2)}%)
-            </span><br>
-            <span class="small">
-                <b>Category:</b> ${d.category}<br>
-                <b>Metric:</b> ${d.evaluate_metric}<br>
-                ${d.logic}
-            </span>
+            ${v.price} (${v.change.toFixed(2)}%)<br>
+            <span class="small">${d.logic}</span>
         `;
-        container.appendChild(div);
+        document.getElementById("grp_" + bucket).appendChild(div);
     });
 
     const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
@@ -177,13 +180,26 @@ async function loadAIMacro(){
         macroScore > 0 ? `<span class="warning">Late-cycle AI (${macroScore.toFixed(2)})</span>` :
         `<span class="exit">Weak / Narrow AI (${macroScore.toFixed(2)})</span>`;
 
-    document.getElementById("macroBreakdown").innerHTML = `
-        Hardware: ${(0.4*hw).toFixed(2)}<br>
-        Hyperscalers: ${(0.25*hs).toFixed(2)}<br>
-        ETFs: ${(0.2*et).toFixed(2)}<br>
-        Macro/Risk: ${(0.15*ma).toFixed(2)}<br><br>
-        <b>Total Macro Score: ${macroScore.toFixed(2)}</b>
-    `;
+    document.getElementById("macroExplain").innerHTML = `
+<b>Hardware (+${(0.4*hw).toFixed(2)}):</b><br>
+Contributors: [${tickers.hardware.join(", ")}]<br>
+${tickers.hardware.length} indicators → average ${hw.toFixed(2)} × 40%<br><br>
+
+<b>Hyperscalers (+${(0.25*hs).toFixed(2)}):</b><br>
+Contributors: [${tickers.hyperscalers.join(", ")}]<br>
+${tickers.hyperscalers.length} indicators → average ${hs.toFixed(2)} × 25%<br><br>
+
+<b>ETFs (+${(0.2*et).toFixed(2)}):</b><br>
+Contributors: [${tickers.etfs.join(", ")}]<br>
+${tickers.etfs.length} indicators → average ${et.toFixed(2)} × 20%<br><br>
+
+<b>Macro / Risk (+${(0.15*ma).toFixed(2)}):</b><br>
+Contributors: [${tickers.macro.join(", ")}]<br>
+${tickers.macro.length} indicators → average ${ma.toFixed(2)} × 15%<br><br>
+
+<b>Total AI Macro Score: ${macroScore.toFixed(2)}</b><br>
+→ Higher score = broader, healthier AI participation
+`;
 }
 
 loadCore();
