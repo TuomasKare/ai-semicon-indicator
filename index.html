@@ -6,13 +6,13 @@
 
 <style>
 body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
-.container { max-width:1000px; margin:auto; }
+.container { max-width:1200px; margin:auto; }
 .card { background:#161616; padding:15px; margin:12px 0; border-radius:10px;}
 .exit { color:red; font-weight:bold;}
 .warning { color:orange;}
 .hold { color:lime;}
 .small { color:#aaa; font-size:13px;}
-.section { margin-top:25px; }
+.grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
 </style>
 </head>
 
@@ -22,14 +22,12 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 
 <h1>AI Semiconductor EXIT Dashboard</h1>
 
-<!-- ========================================================= -->
+<!-- ===================================================== -->
 <!-- CORE EXIT INDICATOR -->
-<!-- ========================================================= -->
+<!-- ===================================================== -->
 
-<div class="card section">
+<div class="card">
 <h2>CORE Exit Indicator</h2>
-
-<b>Market Data</b><br>
 NVDA: <span id="nvda"></span><br>
 SOXX: <span id="soxx"></span><br>
 VIX: <span id="vix"></span><br>
@@ -48,64 +46,41 @@ Updated: <span id="time"></span>
 </div>
 
 <div class="card">
-<h3>Score Explanation</h3>
+<h3>Score Breakdown</h3>
 <div id="scoreExplain"></div>
 <div class="small">
-<b>Formula:</b><br>
-0.4×SOXX + 0.3×NVDA + 0.2×VIX + 0.1×OIL<br><br>
-<b>Ranges:</b><br>
-&gt; 0.5 → Strong bull<br>
-0 … 0.5 → Late cycle<br>
-0 … -0.5 → Warning<br>
-&lt; -0.5 → Exit zone
+0.4×SOXX + 0.3×NVDA + 0.2×VIX + 0.1×OIL
 </div>
 </div>
 
-<!-- ========================================================= -->
-<!-- AI MARKET CONTEXT -->
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- AI MACRO INDICATORS -->
+<!-- ===================================================== -->
 
-<div class="card section">
-<h2>AI Market Context (Breadth & Confirmation)</h2>
-
-<b>Hardware (AI Supply Chain)</b><br>
-NVDA: <span id="ctx_nvda"></span><br>
-AVGO: <span id="ctx_avgo"></span><br>
-AMD: <span id="ctx_amd"></span><br>
-SMCI: <span id="ctx_smci"></span><br><br>
-
-<b>Hyperscalers (CapEx & Adoption Sentiment)</b><br>
-MSFT: <span id="ctx_msft"></span><br>
-GOOGL: <span id="ctx_googl"></span><br>
-AMZN: <span id="ctx_amzn"></span><br>
-META: <span id="ctx_meta"></span><br><br>
-
-<b>AI / Robotics ETFs</b><br>
-SOXX: <span id="ctx_soxx"></span><br>
-BOTZ: <span id="ctx_botz"></span><br>
-THNQ: <span id="ctx_thnq"></span><br>
-AIQ: <span id="ctx_aiq"></span>
+<div class="card">
+<h2>AI Macro Indicator Monitor</h2>
+<div id="aiIndicators" class="grid"></div>
 </div>
 
 </div>
 
 <script>
 
-/* =========================================================
+/* =====================================================
    CORE EXIT INDICATOR (data.json)
-========================================================= */
+===================================================== */
 
 async function loadCore(){
 
-    let res = await fetch("data.json?t=" + Date.now());
-    let d = await res.json();
+    const res = await fetch("data.json?t=" + Date.now());
+    const d = await res.json();
 
-    let nvda = parseFloat(d.nvda);
-    let soxx = parseFloat(d.soxx);
-    let nvdaCh = parseFloat(d.nvdaChange);
-    let soxxCh = parseFloat(d.soxxChange);
-    let vix = parseFloat(d.vix);
-    let oil = parseFloat(d.oil);
+    const nvda = parseFloat(d.nvda);
+    const soxx = parseFloat(d.soxx);
+    const nvdaCh = parseFloat(d.nvdaChange);
+    const soxxCh = parseFloat(d.soxxChange);
+    const vix = parseFloat(d.vix);
+    const oil = parseFloat(d.oil);
 
     document.getElementById("nvda").innerText = nvda + " (" + nvdaCh.toFixed(2) + "%)";
     document.getElementById("soxx").innerText = soxx + " (" + soxxCh.toFixed(2) + "%)";
@@ -113,12 +88,12 @@ async function loadCore(){
     document.getElementById("oil").innerText = oil;
     document.getElementById("time").innerText = d.updated;
 
-    let soxxSignal = soxxCh > 0 ? 1 : -1;
-    let nvdaSignal = nvdaCh > 5 ? -1 : 1;
-    let vixSignal = vix > 25 ? -1 : 0;
-    let oilSignal = oil > 95 ? -0.5 : 0;
+    const soxxSignal = soxxCh > 0 ? 1 : -1;
+    const nvdaSignal = nvdaCh > 5 ? -1 : 1;
+    const vixSignal = vix > 25 ? -1 : 0;
+    const oilSignal = oil > 95 ? -0.5 : 0;
 
-    let score =
+    const score =
         0.4 * soxxSignal +
         0.3 * nvdaSignal +
         0.2 * vixSignal +
@@ -143,44 +118,58 @@ async function loadCore(){
         `<span class="${cls}">${decision} (score ${score.toFixed(2)})</span>`;
 
     document.getElementById("scoreExplain").innerHTML =
-        "SOXX: " + (0.4*soxxSignal).toFixed(2) + "<br>" +
-        "NVDA: " + (0.3*nvdaSignal).toFixed(2) + "<br>" +
-        "VIX: "  + (0.2*vixSignal).toFixed(2) + "<br>" +
-        "OIL: "  + (0.1*oilSignal).toFixed(2) + "<br><br>" +
-        "<b>Total: " + score.toFixed(2) + "</b>";
+        `SOXX: ${(0.4*soxxSignal).toFixed(2)}<br>
+         NVDA: ${(0.3*nvdaSignal).toFixed(2)}<br>
+         VIX: ${(0.2*vixSignal).toFixed(2)}<br>
+         OIL: ${(0.1*oilSignal).toFixed(2)}<br><br>
+         <b>Total: ${score.toFixed(2)}</b>`;
 }
 
-/* =========================================================
-   AI MARKET CONTEXT (ai_macro_indicators.json)
-========================================================= */
+/* =====================================================
+   AI MACRO INDICATORS (definitions + values)
+===================================================== */
 
-async function loadContext(){
+async function loadAIMacro(){
 
-    let res = await fetch("ai_macro_indicators.json?t=" + Date.now());
-    let c = await res.json();
+    const defRes = await fetch("ai_macro_indicators.json");
+    const defs = await defRes.json();
 
-    function p(x){ return x.price + " (" + x.change.toFixed(2) + "%)"; }
+    const valRes = await fetch("ai_macro_values.json?t=" + Date.now());
+    const vals = await valRes.json();
 
-    document.getElementById("ctx_nvda").innerText = p(c.hardware.NVDA);
-    document.getElementById("ctx_avgo").innerText = p(c.hardware.AVGO);
-    document.getElementById("ctx_amd").innerText  = p(c.hardware.AMD);
-    document.getElementById("ctx_smci").innerText = p(c.hardware.SMCI);
+    const container = document.getElementById("aiIndicators");
+    container.innerHTML = "";
 
-    document.getElementById("ctx_msft").innerText = p(c.hyperscalers.MSFT);
-    document.getElementById("ctx_googl").innerText = p(c.hyperscalers.GOOGL);
-    document.getElementById("ctx_amzn").innerText = p(c.hyperscalers.AMZN);
-    document.getElementById("ctx_meta").innerText = p(c.hyperscalers.META);
+    defs.forEach(item => {
 
-    document.getElementById("ctx_soxx").innerText = p(c.etfs.SOXX);
-    document.getElementById("ctx_botz").innerText = p(c.etfs.BOTZ);
-    document.getElementById("ctx_thnq").innerText = p(c.etfs.THNQ);
-    document.getElementById("ctx_aiq").innerText  = p(c.etfs.AIQ);
+        const v = vals.values[item.ticker];
+        if(!v) return;
+
+        const div = document.createElement("div");
+        div.className = "card";
+
+        const changeColor = v.change >= 0 ? "lime" : "orange";
+
+        div.innerHTML = `
+            <b>${item.ticker}</b> — ${item.name}<br>
+            <span style="color:${changeColor}">
+                ${v.price} (${v.change.toFixed(2)}%)
+            </span><br>
+            <span class="small">
+                ${item.category}<br>
+                Metric: ${item.evaluate_metric}<br>
+                ${item.logic}
+            </span>
+        `;
+
+        container.appendChild(div);
+    });
 }
 
-/* ========================================================= */
+/* ===================================================== */
 
 loadCore();
-loadContext();
+loadAIMacro();
 
 </script>
 
