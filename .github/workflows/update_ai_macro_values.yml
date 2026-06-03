@@ -1,0 +1,34 @@
+name: Update AI Macro Values
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"   # every 30 minutes
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install node-fetch
+
+      - name: Run AI macro update script
+        run: node update_ai_macro_values.js
+
+      - name: Commit and push results
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add ai_macro_values.json
+          git commit -m "auto: update AI macro values" || exit 0
+          git pull --rebase
+          git push
