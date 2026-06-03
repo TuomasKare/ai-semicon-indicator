@@ -49,13 +49,7 @@
     "evaluate_metric": "Closing Price Momentum",
     "logic": "A diversified thematic basket tracking pure-play software, data infrastructure, and service layers of the AI economy."
   },
-  {
-    "ticker": "BOTZ",
-    "name": "Global X Robotics & AI ETF",
-    "category": "ETF / Robotics",
-    "evaluate_metric": "Net Asset Value (NAV)",
-    "logic": "Monitors global trends in physical automation, industrial robotics, and computer vision integration."
-  },
+
   {
     "ticker": "SMH",
     "name": "VanEck Semiconductor ETF",
@@ -163,6 +157,15 @@
     "evaluate_metric": "Daily % Price Rate of Change",
     "logic": "Reacts instantly to geopolitical friction, active wars, or physical trade blockages in strategic areas like the Middle East."
   },
+
+  {
+    "ticker": "BOTZ",
+    "name": "Global X Robotics & AI ETF",
+    "category": "Macro / Robotics Automation",
+    "evaluate_metric": "Net Asset Value (NAV)",
+    "logic": "Tracks global robotics and automation adoption cycles, behaving more like a macro-sensitive industrial indicator than a semiconductor benchmark."
+  },
+
   {
     "ticker": "ITA",
     "name": "iShares Aerospace & Defense ETF",
