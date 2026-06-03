@@ -46,19 +46,30 @@ Updated: <span id="time"></span>
 <div class="card">
 <h3>Score Breakdown</h3>
 <div id="scoreExplain"></div>
+<div class="small">
+0.4×SOXX + 0.3×NVDA + 0.2×VIX + 0.1×OIL
+</div>
 </div>
 
 <!-- ================= AI MACRO MONITOR ================= -->
 
 <div class="card">
 <h2>AI Macro Indicator Monitor</h2>
-<div id="aiIndicators" class="grid"></div>
 </div>
 
+<!-- === AI MACRO SCORE (MOVED HERE) === -->
+
 <div class="card">
-<h2>AI Macro Score</h2>
+<h3>AI Macro Score</h3>
 <div id="macroScore"></div>
 <div id="macroBreakdown" class="small"></div>
+</div>
+
+<!-- === AI MACRO INDICATORS WITH EXPLANATIONS === -->
+
+<div class="card">
+<h3>AI Macro Indicators (Details)</h3>
+<div id="aiIndicators" class="grid"></div>
 </div>
 
 </div>
@@ -94,9 +105,16 @@ async function loadCore(){
         score > 0 ? `<span class="warning">HOLD (Late) (${score.toFixed(2)})</span>` :
         score > -0.5 ? `<span class="warning">WARNING (${score.toFixed(2)})</span>` :
         `<span class="exit">EXIT (${score.toFixed(2)})</span>`;
+
+    document.getElementById("scoreExplain").innerHTML =
+        `SOXX: ${(0.4*soxxSignal).toFixed(2)}<br>
+         NVDA: ${(0.3*nvdaSignal).toFixed(2)}<br>
+         VIX: ${(0.2*vixSignal).toFixed(2)}<br>
+         OIL: ${(0.1*oilSignal).toFixed(2)}<br><br>
+         <b>Total: ${score.toFixed(2)}</b>`;
 }
 
-/* ================= AI MACRO SCORE ================= */
+/* ================= AI MACRO SCORE + DETAILS ================= */
 
 async function loadAIMacro(){
     const defs = await (await fetch("ai_macro_indicators.json")).json();
@@ -109,51 +127,61 @@ async function loadAIMacro(){
         macro: []
     };
 
+    const container = document.getElementById("aiIndicators");
+    container.innerHTML = "";
+
     defs.forEach(d => {
         const v = vals.values[d.ticker];
         if(!v) return;
 
-        const score = v.change > 0 ? 1 : v.change < 0 ? -1 : 0;
+        const s = v.change > 0 ? 1 : v.change < 0 ? -1 : 0;
 
-        if(d.category.includes("Semiconductor") || d.category.includes("AI / GPU"))
-            groups.hardware.push(score);
+        if(d.category.includes("Semiconductor") || d.category.includes("GPU") || d.category.includes("CPU"))
+            groups.hardware.push(s);
         else if(d.category.includes("Cloud") || d.category.includes("Software"))
-            groups.hyperscalers.push(score);
+            groups.hyperscalers.push(s);
         else if(d.category.includes("ETF"))
-            groups.etfs.push(score);
+            groups.etfs.push(s);
         else
-            groups.macro.push(score);
+            groups.macro.push(s);
+
+        const color = v.change >= 0 ? "lime" : "orange";
 
         const div = document.createElement("div");
         div.className = "card";
         div.innerHTML = `
-            <b>${d.ticker}</b><br>
-            ${v.price} (${v.change.toFixed(2)}%)<br>
-            <span class="small">${d.category}</span>
+            <b>${d.ticker}</b> — ${d.name}<br>
+            <span style="color:${color}">
+                ${v.price} (${v.change.toFixed(2)}%)
+            </span><br>
+            <span class="small">
+                <b>Category:</b> ${d.category}<br>
+                <b>Metric:</b> ${d.evaluate_metric}<br>
+                ${d.logic}
+            </span>
         `;
-        document.getElementById("aiIndicators").appendChild(div);
+        container.appendChild(div);
     });
 
-    const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+    const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
 
     const hw = avg(groups.hardware);
     const hs = avg(groups.hyperscalers);
     const et = avg(groups.etfs);
     const ma = avg(groups.macro);
 
-    const macroScore =
-        0.4*hw + 0.25*hs + 0.2*et + 0.15*ma;
+    const macroScore = 0.4*hw + 0.25*hs + 0.2*et + 0.15*ma;
 
     document.getElementById("macroScore").innerHTML =
         macroScore > 0.5 ? `<span class="hold">Strong AI Breadth (${macroScore.toFixed(2)})</span>` :
-        macroScore > 0 ? `<span class="warning">Late AI Cycle (${macroScore.toFixed(2)})</span>` :
+        macroScore > 0 ? `<span class="warning">Late-cycle AI (${macroScore.toFixed(2)})</span>` :
         `<span class="exit">Weak / Narrow AI (${macroScore.toFixed(2)})</span>`;
 
     document.getElementById("macroBreakdown").innerHTML = `
         Hardware: ${(0.4*hw).toFixed(2)}<br>
         Hyperscalers: ${(0.25*hs).toFixed(2)}<br>
         ETFs: ${(0.2*et).toFixed(2)}<br>
-        Macro: ${(0.15*ma).toFixed(2)}<br><br>
+        Macro/Risk: ${(0.15*ma).toFixed(2)}<br><br>
         <b>Total Macro Score: ${macroScore.toFixed(2)}</b>
     `;
 }
