@@ -1,0 +1,219 @@
+[
+  {
+    "ticker": "NVDA",
+    "name": "NVIDIA Corp.",
+    "category": "AI / GPU Leader",
+    "evaluate_metric": "Market Cap & Forward P/E",
+    "logic": "The ultimate proxy for global AI hardware infrastructure spending, data center compute, and GPU market share dominance."
+  },
+  {
+    "ticker": "MSFT",
+    "name": "Microsoft Corp.",
+    "category": "AI Cloud / Software",
+    "evaluate_metric": "Quarterly Cloud Growth %",
+    "logic": "Tracks enterprise software monetization and mainstream corporate adoption of Generative AI via Copilot and Azure."
+  },
+  {
+    "ticker": "AVGO",
+    "name": "Broadcom Inc.",
+    "category": "AI Hardware / Custom Silicon",
+    "evaluate_metric": "Revenue Growth / Margins",
+    "logic": "Tracks custom AI ASIC chips (like Google TPUs) and high-speed data center networking switch demand."
+  },
+  {
+    "ticker": "GOOGL",
+    "name": "Alphabet Inc.",
+    "category": "AI Cloud / Consumer",
+    "evaluate_metric": "Capital Expenditures (CapEx)",
+    "logic": "Measures massive hyper-scaler capital investments into data factories and consumer-facing AI model deployment."
+  },
+  {
+    "ticker": "AMZN",
+    "name": "Amazon.com Inc.",
+    "category": "AI Cloud Infrastructure",
+    "evaluate_metric": "AWS Revenue Growth %",
+    "logic": "A direct indicator of institutional enterprise migration to cloud-hosted AI model platforms."
+  },
+  {
+    "ticker": "META",
+    "name": "Meta Platforms Inc.",
+    "category": "AI Open Source / Ads",
+    "evaluate_metric": "Ad Impression Yield / CapEx",
+    "logic": "Represents open-source AI infrastructure deployment (Llama) and AI-driven ad-targeting optimization."
+  },
+  {
+    "ticker": "THNQ",
+    "name": "ROBO Global AI ETF",
+    "category": "AI Pure-Play Software",
+    "evaluate_metric": "Closing Price Momentum",
+    "logic": "A diversified thematic basket tracking pure-play software, data infrastructure, and service layers of the AI economy."
+  },
+  {
+    "ticker": "BOTZ",
+    "name": "Global X Robotics & AI ETF",
+    "category": "AI / Robotics",
+    "evaluate_metric": "Net Asset Value (NAV)",
+    "logic": "Monitors global trends in physical automation, industrial robotics, and computer vision integration."
+  },
+  {
+    "ticker": "SMH",
+    "name": "VanEck Semiconductor ETF",
+    "category": "Semiconductor Benchmark",
+    "evaluate_metric": "Volume / Trend Relative to S&P 500",
+    "logic": "The premier institutional benchmark used to gauge the macroeconomic momentum, liquidity, and trading velocity of the global chip sector."
+  },
+  {
+    "ticker": "SOXX",
+    "name": "iShares Semiconductor ETF",
+    "category": "Semiconductor Macro",
+    "evaluate_metric": "200-Day Moving Average",
+    "logic": "Tracks a market-cap-weighted index of the 30 largest US-listed chip designers and fabricators."
+  },
+  {
+    "ticker": "XSD",
+    "name": "SPDR S&P Semiconductor ETF",
+    "category": "Semiconductor Equal-Weight",
+    "evaluate_metric": "Price Deviations from SMH",
+    "logic": "Equal-weighted index that highlights the financial health of small-to-mid-cap specialty chip design firms over tech giants."
+  },
+  {
+    "ticker": "TSM",
+    "name": "Taiwan Semiconductor Manufacturing",
+    "category": "Semiconductor Foundry",
+    "evaluate_metric": "Fab Utilization & Monthly Revenue",
+    "logic": "The ultimate physical bottleneck of global technology. Fabricates over 90% of advanced processing chips for Apple, Nvidia, and AMD."
+  },
+  {
+    "ticker": "ASML",
+    "name": "ASML Holding N.V.",
+    "category": "Semi Capital Equipment",
+    "evaluate_metric": "Order Book Backlog",
+    "logic": "Holds an absolute global monopoly on Extreme Ultraviolet (EUV) lithography machines required to manufacture sub-3nm chips."
+  },
+  {
+    "ticker": "AMAT",
+    "name": "Applied Materials Inc.",
+    "category": "Semi Capital Equipment",
+    "evaluate_metric": "Forward Revenue Guidance",
+    "logic": "Leading indicator of global semiconductor fabrication plant (fab) construction and factory line expansion."
+  },
+  {
+    "ticker": "LRCX",
+    "name": "Lam Research Corp.",
+    "category": "Semi Capital Equipment",
+    "evaluate_metric": "Profit Margins",
+    "logic": "Tracks specialized wafer fabrication equipment, indicating supply-chain resilience and manufacturing scale."
+  },
+  {
+    "ticker": "INTC",
+    "name": "Intel Corp.",
+    "category": "CPU / Western Manufacturing",
+    "evaluate_metric": "Market Cap / CPU Market Share",
+    "logic": "Represents legacy x86 personal computer CPU volume and Western efforts to onshore sovereign semiconductor fabrication."
+  },
+  {
+    "ticker": "AMD",
+    "name": "Advanced Micro Devices",
+    "category": "CPU / GPU Challenger",
+    "evaluate_metric": "Market Cap Ratio to INTC & NVDA",
+    "logic": "The premier cross-over indicator tracking market share gains over Intel in data center CPUs and Nvidia in budget GPUs."
+  },
+  {
+    "ticker": "ARM",
+    "name": "Arm Holdings plc",
+    "category": "CPU / Next-Gen Architecture",
+    "evaluate_metric": "Price-to-Sales (P/S) Ratio",
+    "logic": "Monitors the multi-year structural architectural shift away from legacy x86 processors toward power-efficient mobile and cloud architectures."
+  },
+  {
+    "ticker": "QCOM",
+    "name": "Qualcomm Inc.",
+    "category": "Mobile Processing / Edge AI",
+    "evaluate_metric": "Inventory Turnover Levels",
+    "logic": "Acts as the primary demand proxy for global smartphone volume, mobile systems-on-chip (SoCs), and automotive computers."
+  },
+  {
+    "ticker": "MU",
+    "name": "Micron Technology",
+    "category": "Cyclical Memory (DRAM/NAND)",
+    "evaluate_metric": "Average Selling Price (ASP) of Memory",
+    "logic": "The absolute best indicator for checking chip supply gluts or shortages. Memory is highly cyclical and reacts first to supply imbalances."
+  },
+  {
+    "ticker": "AAPL",
+    "name": "Apple Inc.",
+    "category": "Vertical Processing Consumer",
+    "evaluate_metric": "Consumer Hardware Gross Margins",
+    "logic": "Tracks the closed-ecosystem deployment of advanced proprietary M-series and A-series silicon, serving as a high-end consumer hardware proxy."
+  },
+  {
+    "ticker": "^VIX",
+    "name": "CBOE Volatility Index",
+    "category": "Global Market Sentiment",
+    "evaluate_metric": "Absolute Value (Above/Below 20)",
+    "logic": "Wall Street's 'Fear Gauge.' Sudden spikes signal geopolitical panic, institutional hedging, or immediate structural market turmoil."
+  },
+  {
+    "ticker": "CL=F",
+    "name": "Crude Oil Futures (WTI)",
+    "category": "Geopolitical Energy",
+    "evaluate_metric": "Daily % Price Rate of Change",
+    "logic": "Reacts instantly to geopolitical friction, active wars, or physical trade blockages in strategic areas like the Middle East."
+  },
+  {
+    "ticker": "ITA",
+    "name": "iShares Aerospace & Defense ETF",
+    "category": "Defense & War Proxy",
+    "evaluate_metric": "Price Trends during Regional Conflicts",
+    "logic": "Tracks major defense prime contractors. Rises when international political tensions forecast scaling defense budgets."
+  },
+  {
+    "ticker": "BDRY",
+    "name": "Breakwave Dry Bulk Shipping ETF",
+    "category": "Tariffs / Global Trade",
+    "evaluate_metric": "Daily Transport Rate Changes",
+    "logic": "Tracks dry bulk shipping costs. Drastic drops or surges expose structural supply chain friction, global trade slowdowns, or retaliatory tariffs."
+  },
+  {
+    "ticker": "FXI",
+    "name": "iShares China Large-Cap ETF",
+    "category": "Trade Protectionism / Tariffs",
+    "evaluate_metric": "Volatility Shocks vs US Indices",
+    "logic": "Serves as an indirect counter-proxy for international trade wars. Drops drastically when aggressive tariff policies target global exporters."
+  },
+  {
+    "ticker": "GLD",
+    "name": "SPDR Gold Shares",
+    "category": "Currency Debasement / Safety",
+    "evaluate_metric": "Spot Price relative to US Dollar",
+    "logic": "The premier safe-haven index. Evaluates central bank asset diversification away from fiat currencies and signals systemic inflation hedging."
+  },
+  {
+    "ticker": "GDX",
+    "name": "VanEck Gold Miners ETF",
+    "category": "Precious Metal Infrastructure",
+    "evaluate_metric": "Operating Leverage vs Spot Gold",
+    "logic": "Tracks physical gold extraction companies. Evaluates operational profitability shifts resulting from major geographic gold findings or asset reassessments."
+  },
+  {
+    "ticker": "BTC-USD",
+    "name": "Bitcoin / Digital Assets",
+    "category": "Alternative Speculative Risk",
+    "evaluate_metric": "Liquidity Inflow Rates",
+    "logic": "Evaluated as a decentralized digital store of value that gains momentum during regional banking panics or macro capital controls."
+  },
+  {
+    "ticker": "DX-Y.NYB",
+    "name": "US Dollar Index (DXY)",
+    "category": "Monetary Liquidity",
+    "evaluate_metric": "Absolute Strength against Currency Basket",
+    "logic": "Measures 'King Dollar.' A strengthening DXY signals global capital moving to safety, which strips liquidity out of international and emerging markets."
+  },
+  {
+    "ticker": "^TNX",
+    "name": "CBOE 10-Year Treasury Yield",
+    "category": "Cost of Capital / Yield Curve",
+    "evaluate_metric": "Yield Spikes vs Dips",
+    "logic": "Represent the global risk-free rate. Rapid drops reveal institutional 'flights to safety' via bonds, while surges signal structural inflation worries."
+  }
+]
