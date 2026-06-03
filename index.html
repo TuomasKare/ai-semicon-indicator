@@ -1,223 +1,77 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>AI Semiconductor EXIT Dashboard</title>
+AI SECTOR
+1. The Infrastructure & Chip Layer (Hardware Proxies)Hardware is the most direct indicator of AI market health. 
+These companies report capital expenditures and revenues directly tied to AI data center builds.
 
-<style>
-body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
-.container { max-width:900px; margin:auto; }
-.card { background:#161616; padding:15px; margin:10px 0; border-radius:10px;}
-.exit { color:red; font-weight:bold;}
-.warning { color:orange;}
-.hold { color:lime;}
-.small { color:#aaa; font-size:13px;}
-</style>
+NVDA (NVIDIA Corp): The ultimate proxy for AI chip demand and graphic processing units (GPUs).
+AVGO (Broadcom Inc): Tracks custom AI application-specific integrated circuit (ASIC) chips and networking hardware.
+AMD (Advanced Micro Devices): Tracks the secondary market for AI accelerators and competitive chip pricing.
+SMCI (Super Micro Computer): Represents the demand for liquid-cooled AI server racks and hardware integration.
 
-</head>
+2. The Cloud Hyperscaler Layer (Software & CapEx Proxies)These companies build the large language models (LLMs) and host the cloud platforms where enterprise AI runs. Their quarterly capital expenditures (CapEx) dictate the health of the entire AI supply chain.
 
-<body>
+MSFT (Microsoft Corp): Tracks commercial enterprise AI adoption via Copilot and Azure's partnership with OpenAI.
+GOOGL (Alphabet Inc): Tracks institutional AI research, consumer AI tools (Gemini), and Google Cloud deployment.
+AMZN (Amazon.com Inc): Tracks AWS cloud infrastructure scaling and enterprise AI application hosting.
+META (Meta Platforms): Tracks open-source model development (Llama) and AI-driven digital advertising optimization.
 
-<div class="container">
+3. The Pure-Play AI ETFs (Thematic Market Indicators)Instead of tracking single stocks, you can fetch thematic Exchange Traded Funds (ETFs) to get an automated, diversified view of the entire AI industry's market capitalization.
 
-<h1>AI Semiconductor EXIT Dashboard (Real Data)</h1>
+BOTZ (Global X Robotics & Artificial Intelligence ETF): Tracks global companies involved in industrial robotics and AI development.
+THNQ (ROBO Global Artificial Intelligence ETF): Focuses heavily on the computing, data, and services layer of AI software.
+AIQ (Global X Artificial Intelligence & Technology ETF): Tracks large-cap tech companies utilizing AI across consumer platforms.
+SOXX (iShares Semiconductor ETF): While not purely AI, it tracks the global semiconductor industry, which is the foundational bottle-neck for all AI computing.
 
-<div class="card">
-<h3>Market Data</h3>
-NVDA: <span id="nvda"></span><br>
-SOXX: <span id="soxx"></span><br>
-VIX: <span id="vix"></span><br>
-OIL: <span id="oil"></span><br>
-Updated: <span id="time"></span>
-</div>
 
-<div class="card">
-<h3>Indicator Interpretation</h3>
+Semiconductors
+1. The Core Sector ETFs (Macro Market Indicators)Instead of tracking individual stocks, these benchmark ETFs provide an automated, highly accurate view of the overall sector's health, momentum, and volume.
 
-<b>SOXX (40%)</b><br>
-<span id="soxxExplain"></span><br><br>
+SOXX (iShares Semiconductor ETF): The most liquid benchmark. It tracks the 30 largest US-listed semiconductor companies.
+SMH (VanEck Semiconductor ETF): Highly concentrated in top-tier global firms. This is the primary indicator used by institutional traders.
+XSD (SPDR S&P Semiconductor ETF): An equal-weighted ETF. It gives more weight to small and mid-cap chip companies, making it a great indicator for the broader industry beyond just the tech giants.
 
-<b>NVDA (30%)</b><br>
-<span id="nvdaExplain"></span><br><br>
+2. Capital Equipment & Lithography (The Supply Chain Bottleneck)Before a company can design or sell a chip, they must buy the machinery to build it. Equipment makers are the earliest leading indicators of global chip supply.
 
-<b>VIX (20%)</b><br>
-<span id="vixExplain"></span><br><br>
+ASML (ASML Holding): The absolute monopoly provider of Extreme Ultraviolet (EUV) lithography machines. No advanced chips can be made without them.
+AMAT (Applied Materials): Supplies the essential engineering equipment, software, and services used to manufacture semiconductor wafers.
+LRCX (Lam Research): Specializes in wafer fabrication equipment, acting as an excellent indicator for global factory capacity expansion.
 
-<b>OIL (10%)</b><br>
-<span id="oilExplain"></span>
+3. Foundries & Manufacturing (The Production Output)These companies do the physical fabrication of the chips. Their fabrication plant (fab) utilization rates tell you if global electronics demand is rising or falling.
+TSM (Taiwan Semiconductor Manufacturing Co.): The world's largest independent foundry. It manufactures chips for Apple, Nvidia, AMD, and Qualcomm, making it the single most critical ticker in global tech.INTC (Intel Corp): Represents integrated device manufacturing and western efforts to onshore advanced semiconductor fabs.
 
-</div>
+4. Chip Designers & Architecture (The Demand Layer)These "fabless" companies design the processors, wireless modems, and memory chips that power automobiles, smartphones, and computers.
+ARM (Arm Holdings): Controls the foundational architecture and intellectual property behind virtually all mobile, automotive, and energy-efficient cloud processors.
+QCOM (Qualcomm Inc): The premier indicator for the smartphone and mobile device market.
+MU (Micron Technology): Tracks the global memory (DRAM/NAND) market. Memory is highly cyclical, making MU a fantastic indicator for computing supply-and-demand gluts.
 
-<div class="card">
-<h3>Signals</h3>
-<div id="signals"></div>
-</div>
 
-<div class="card">
-<h3>Decision</h3>
-<div id="decision"></div>
-</div>
 
-<div class="card">
-<h3>Score Explanation</h3>
+CPU / GPU MARKET 
 
-<div id="scoreExplain"></div><br>
+1. The Core GPU & AI Accelerators (Graphics & Compute)These tickers indicate the health of the visual processing, PC gaming, data center acceleration, and AI training markets.NVDA (NVIDIA Corp): The undisputed global benchmark for GPUs. It serves as the primary indicator for discrete PC gaming graphics cards, data center computing power, and AI processing.
+AMD (Advanced Micro Devices): The critical cross-over indicator. It is the only company that competes aggressively in both the high-end GPU market (Radeon) and the x86 CPU market (Ryzen/EPYC).
 
-<div class="small">
-<b>Score formula:</b><br>
-= 0.4×SOXX + 0.3×NVDA + 0.2×VIX + 0.1×OIL<br><br>
+2. The Core CPU Giants (Client PC & Enterprise Data Center)These tickers measure the volume of personal computers, business laptops, and traditional cloud servers being built globally.
+INTC (Intel Corp): The legacy volume leader for x86 CPUs. Monitoring Intel provides a direct read on the health of global corporate IT infrastructure budgets and retail consumer PC demand.
+ARM (Arm Holdings): The premier licensing architecture proxy. Arm does not build physical chips; instead, it licenses the low-power architecture used by Apple, Qualcomm, and cloud providers to build custom CPUs, threatening traditional x86 processors.
 
-<b>Interpretation:</b><br>
-> 0.5 → Strong bull trend<br>
-0 to 0.5 → Late cycle<br>
-0 to -0.5 → Warning (risk increasing)<br>
-< -0.5 → Exit zone (high probability top)<br>
-</div>
+3. Alternative Processing Architectures (Mobile, Auto, & Specialized)CPUs and GPUs are rapidly moving into vehicles, mobile systems-on-chip (SoCs), and edge devices. These indicators capture that market shift.
+QCOM (Qualcomm Inc): A major indicator for mobile processors (Snapdragon CPUs/Adreno GPUs) and the emerging market for ARM-based Windows laptop CPUs.
+AAPL (Apple Inc): A vital proxy for vertically integrated processing. Apple's custom M-series and A-series chips represent a massive chunk of high-performance CPU/GPU production that is completely closed off to Intel, AMD, and Nvidia.
 
-</div>
+GLOBAL MARKET
+1. Geopolitical Risk & Conflict Sentiments (The War Proxies)When military tensions scale up or international trade routes are threatened, investors immediately adjust their positions in energy, defense, and volatility trackers.
+VIX (CBOE Volatility Index): Wall Street's primary "Fear Gauge." Spikes over 20 generally reflect immediate geopolitical panic or market instability.
+CL=F (Crude Oil FUTURES): Geopolitical friction—especially in areas like the Middle East or trade chokepoints—causes sharp supply concerns, instantly lifting crude prices.
+ITA (iShares U.S. Aerospace & Defense ETF): Tracks major defense prime contractors. This ticker rises when global defense spending forecasts scale up due to active military conflicts.
 
-</div>
+2. Tariffs & Trade Protectionism (The Global Friction Layer)Tariffs restrict the free movement of goods, adding overhead costs to international trade networks. You can track this friction through localized supply chain and transport indices.
+BADI (Baltic Dry Index - Note: Search for tracking ETFs like BDRY): Measures the cost of moving raw materials by sea. Sharp dips or spikes indicate trade blockages, tariff adjustments, or disruptions in shipping lanes.
+FXI (iShares China Large-Cap ETF): Serves as an effective counter-proxy for US-led international tariff policies. Trade restrictions heavily affect large Chinese manufacturing and tech exporters, making this ticker high-beta to tariff headlines.
 
-<script>
+3. Currency Debasement & "New Gold Findings" (The Value Store)Central banks globally are actively restructuring reserves away from fiat currencies due to sanctions risks. Gold set an all-time high of $5,589.38/oz earlier this year before consolidating. New physical gold discoveries briefly shock localized mining stocks, but macro sentiment dictates the asset's trajectory.
 
-async function loadData(){
-
-    try {
-
-        let res = await fetch("data.json?t=" + new Date().getTime());
-        let d = await res.json();
-
-        let nvda = parseFloat(d.nvda);
-        let soxx = parseFloat(d.soxx);
-        let nvdaChange = parseFloat(d.nvdaChange);
-        let soxxChange = parseFloat(d.soxxChange);
-        let vix = parseFloat(d.vix);
-        let oil = parseFloat(d.oil);
-
-        if(isNaN(nvdaChange) || isNaN(soxxChange)){
-            throw new Error("Invalid data values");
-        }
-
-        document.getElementById("nvda").innerText = nvda + " (" + nvdaChange.toFixed(2) + "%)";
-        document.getElementById("soxx").innerText = soxx + " (" + soxxChange.toFixed(2) + "%)";
-        document.getElementById("vix").innerText = vix;
-        document.getElementById("oil").innerText = oil;
-        document.getElementById("time").innerText = d.updated;
-
-        // ===== SIGNALS =====
-
-        let soxxSignal = soxxChange > 0 ? 1 : -1;
-        let nvdaSignal = nvdaChange > 5 ? -1 : 1;
-        let vixSignal = vix > 25 ? -1 : 0;
-        let oilSignal = oil > 95 ? -0.5 : 0;
-
-        let score =
-            0.4 * soxxSignal +
-            0.3 * nvdaSignal +
-            0.2 * vixSignal +
-            0.1 * oilSignal;
-
-        // ===== EXPLANATIONS =====
-
-        document.getElementById("soxxExplain").innerText =
-            soxxSignal > 0
-            ? "Semiconductors rising → demand strong"
-            : "Semiconductors weakening → early warning";
-
-        document.getElementById("nvdaExplain").innerText =
-            nvdaSignal > 0
-            ? "AI growth healthy"
-            : "AI overheating → late cycle";
-
-        document.getElementById("vixExplain").innerText =
-            vixSignal === 0
-            ? "Low volatility → stable"
-            : "High volatility → risk-off";
-
-        document.getElementById("oilExplain").innerText =
-            oilSignal === 0
-            ? "No major macro stress"
-            : "Oil spike → geopolitical risk";
-
-        // ===== SIGNAL LIST =====
-
-        let signals = [];
-
-        if(nvdaSignal === -1) signals.push("AI overheating");
-        if(soxxSignal === -1) signals.push("Semiconductors weakening");
-        if(vixSignal === -1) signals.push("Market risk rising");
-        if(oilSignal < 0) signals.push("Geopolitical stress");
-
-        let defaultMsg;
-
-        if(score > 0.5){
-            defaultMsg = "Strong trend intact";
-        } else if(score > 0){
-            defaultMsg = "Late-cycle conditions";
-        } else {
-            defaultMsg = "No major warning signals yet";
-        }
-
-        document.getElementById("signals").innerHTML =
-            signals.length ? signals.join("<br>") : defaultMsg;
-
-        // ===== DECISION =====
-
-        let decision = "";
-        let cls = "";
-
-        if(score < -0.5){
-            decision = "EXIT";
-            cls = "exit";
-        } else if(score < 0){
-            decision = "WARNING";
-            cls = "warning";
-        } else if(score < 0.5){
-            decision = "HOLD (Late)";
-            cls = "warning";
-        } else {
-            decision = "HOLD (Strong)";
-            cls = "hold";
-        }
-
-        document.getElementById("decision").innerHTML =
-            `<span class="${cls}">${decision} (score ${score.toFixed(2)})</span>`;
-
-        // ===== SCORE EXPLANATION =====
-
-        let scoreText = "";
-
-        scoreText += "SOXX contributes: " + (0.4 * soxxSignal).toFixed(2) + "<br>";
-        scoreText += "NVDA contributes: " + (0.3 * nvdaSignal).toFixed(2) + "<br>";
-        scoreText += "VIX contributes: " + (0.2 * vixSignal).toFixed(2) + "<br>";
-        scoreText += "OIL contributes: " + (0.1 * oilSignal).toFixed(2) + "<br><br>";
-
-        scoreText += "<b>Total Score: " + score.toFixed(2) + "</b><br><br>";
-
-        if(score > 0.5){
-            scoreText += "→ Market in strong uptrend (low exit risk)";
-        } else if(score > 0){
-            scoreText += "→ Late-stage trend (watch for cracks)";
-        } else if(score > -0.5){
-            scoreText += "→ Warning phase (reduce exposure gradually)";
-        } else {
-            scoreText += "→ Exit zone (high probability of cycle turning)";
-        }
-
-        document.getElementById("scoreExplain").innerHTML = scoreText;
-
-    } catch (err) {
-
-        console.error(err);
-
-        document.getElementById("signals").innerHTML = "❌ Error loading data";
-        document.getElementById("decision").innerHTML = "Check console (F12)";
-    }
-}
-
-loadData();
-
-</script>
-
-</body>
-</html>
+GC=F (Gold Futures) or GLD (SPDR Gold Shares): The ultimate safe-haven index. Major banks like J.P. Morgan and Wells Fargo currently maintain year-end targets exceeding $6,000 per ounce due to structural central bank accumulation and global inflation.
+sGDX (VanEck Gold Miners ETF): Tracks the companies that extract gold. If a massive new gold mine or finding is announced, these companies gain operational leverage, outperforming the spot price of gold itself.
+BTC-USD (Bitcoin): Increasingly treated as a speculative digital store of value during regional banking or geopolitical panics.4. Money Supply & Central Bank Policies (The Liquidity Layer)The cost and availability of money dictate whether markets can shrug off political events. If central banks inject liquidity or cut rates, equity markets often bounce back quickly despite regional turbulences.
+DX-Y.NYB (US Dollar Index): Measures the absolute strength of the USD against a basket of global currencies. A rising "King Dollar" signals a massive global migration toward safety, drawing liquidity out of emerging market equities.
+TNX (CBOE 10-Year Treasury Yield): Represents the benchmark cost of capital. When global tensions spike unexpectedly, a sudden drop in this yield reveals a "flight to safety" as institutional investors rush to lock in secure government bonds.
