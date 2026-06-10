@@ -5,7 +5,7 @@ const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 const OUTPUT_FILE = "smh.json";
-const SHARES = 102.6; // your owned VVSM shares
+const SHARES = "102.6"; // your owned VVSM shares
 
 // Yahoo symbol for XETR: VVSM is VVSM.DE (priced in EUR)
 const ETF_SYMBOL = "VVSM.DE";
