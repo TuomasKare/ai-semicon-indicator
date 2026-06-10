@@ -3,7 +3,7 @@ name: Update AI Macro Values
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/30 * * * *"   # every 30 minutes
+    - cron: "*/15 * * * *"   # every 30 minutes
 
 jobs:
   update:
