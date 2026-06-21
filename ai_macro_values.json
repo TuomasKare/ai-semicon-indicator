@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-21T09:07:36.195Z",
+  "updated": "2026-06-21T10:21:51.752Z",
   "values": {
     "NVDA": {
       "price": 210.69,
@@ -102,8 +102,8 @@
       "change": -6.09
     },
     "FXI": {
-      "price": 33.65,
-      "change": -4.65
+      "price": 33.3,
+      "change": -5.64
     },
     "GLD": {
       "price": 387.12,
@@ -114,8 +114,8 @@
       "change": 3.1
     },
     "BTC-USD": {
-      "price": 63889.91,
-      "change": -0.82
+      "price": 64220.31,
+      "change": -0.31
     },
     "DX-Y.NYB": {
       "price": 100.85,
