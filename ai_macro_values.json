@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-21T20:02:42.229Z",
+  "updated": "2026-06-21T20:53:27.627Z",
   "values": {
     "NVDA": {
       "price": 210.69,
@@ -114,8 +114,8 @@
       "change": 3.1
     },
     "BTC-USD": {
-      "price": 64115.56,
-      "change": -0.47
+      "price": 63695.26,
+      "change": -1.12
     },
     "DX-Y.NYB": {
       "price": 100.85,
