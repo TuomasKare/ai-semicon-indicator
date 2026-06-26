@@ -1,292 +1,114 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>AI Semiconductor EXIT Dashboard</title>
-<style>
-body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
-.container { max-width:1200px; margin:auto; }
-.card { background:#161616; padding:15px; margin:12px 0; border-radius:10px;}
-.exit { color:red; font-weight:bold;}
-.warning { color:orange;}
-.hold { color:lime;}
-.small { color:#aaa; font-size:13px;}
-.grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
-.group-title { margin-top:20px; font-weight:bold; font-size:16px;}
-</style>
+const fs = require("fs");
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+// fetch for Node environment
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-<body>
-<div class="container">
-<h1>AI Semiconductor EXIT Dashboard</h1>
+const OUTPUT_FILE = "smh.json";
+const SHARES = "102.6"; // your owned VVSM shares
 
-<!-- ================= VVSM PRICE & POSITION VALUE ================= -->
-<div class="card">
-  <h2>VanEck Semiconductor UCITS ETF (VVSM) — Your Position</h2>
-  <canvas id="smhChart" height="120"></canvas>
-  <div id="smhValue" class="small" style="margin-top:10px;"></div>
-</div>
+// Yahoo symbol for XETR: VVSM is VVSM.DE (priced in EUR)
+const ETF_SYMBOL = "VVSM.DE";
 
-<!-- ================= CORE EXIT INDICATOR ================= -->
-<div class="card">
-<h2>CORE Exit Indicator</h2>
-NVDA: <span id="nvda"></span><br>
-SOXX: <span id="soxx"></span><br>
-VIX: <span id="vix"></span><br>
-OIL: <span id="oil"></span><br>
-Updated: <span id="time"></span>
-</div>
+// Top VVSM holdings
+const VVSM_HOLDINGS = [
+  { ticker: "NVDA", name: "NVIDIA" },
+  { ticker: "BROADCOM", name: "Broadcom" },
+  { ticker: "QCOM", name: "Qualcomm" },
+  { ticker: "AMD", name: "Advanced Micro Devices" },
+  { ticker: "INTC", name: "Intel" },
+  { ticker: "ASML", name: "ASML" },
+  { ticker: "TSM", name: "Taiwan Semiconductor" },
+  { ticker: "MU", name: "Micron Technology" }
+];
 
-<div class="card">
-<h3>Final Decision</h3>
-<div id="decision"></div>
-</div>
+async function fetchYahooChart(symbol, range = "1mo", interval = "1d") {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=${interval}`;
+  const res = await fetch(url);
+  const json = await res.json();
+  const result = json.chart?.result?.[0];
+  if (!result) throw new Error(`No data for ${symbol}`);
 
-<div class="card">
-<h3>CORE Score Breakdown</h3>
-<div id="scoreExplain"></div>
-<div class="small">
-0.4×SOXX + 0.3×NVDA + 0.2×VIX + 0.1×OIL
-</div>
-</div>
+  const closes = result.indicators.quote[0].close;
+  const timestamps = result.timestamp;
 
-<!-- ================= CORE EXPLANATION ================= -->
-<div class="card">
-<h3>How the CORE Score Works</h3>
-<div class="small">
-<b>SOXX (40% weight):</b> Measures broad semiconductor sector strength.<br>
-<b>NVDA (30% weight):</b> Tracks the AI cycle leader. A drop >5% flips negative.<br>
-<b>VIX (20% weight):</b> Market fear index. Above 25 = risk-off.<br>
-<b>OIL (10% weight):</b> Proxy for geopolitical tension. Above 95 = negative.<br><br>
+  const filtered = [];
+  const filteredTimestamps = [];
+  for (let i = 0; i < closes.length; i++) {
+    if (closes[i] != null) {
+      filtered.push(Number(closes[i].toFixed(2)));
+      filteredTimestamps.push(timestamps[i]);
+    }
+  }
 
-<b>Final Score:</b> Weighted sum of all signals.<br>
-<b>HOLD:</b> score > 0.5<br>
-<b>LATE HOLD:</b> 0–0.5<br>
-<b>WARNING:</b> −0.5–0<br>
-<b>EXIT:</b> ≤ −0.5
-</div>
-</div>
-
-<!-- ================= AI MACRO MONITOR ================= -->
-<div class="card">
-<h2>AI Macro Indicator Monitor</h2>
-</div>
-
-<div class="card">
-<h3>AI Macro Score</h3>
-<div id="macroScore"></div>
-<div id="macroExplain" class="small" style="margin-top:10px;"></div>
-</div>
-
-<!-- ================= AI MACRO EXPLANATION ================= -->
-<div class="card">
-<h3>How the AI Macro Score Works</h3>
-<div class="small">
-<b>Hardware (45% weight):</b><br>
-Tracks the physical AI infrastructure layer — GPUs, CPUs, memory, foundries, and semiconductor equipment.<br>
-Positive hardware = strong AI demand and healthy supply chain.<br><br>
-
-<b>Hyperscalers (30% weight):</b><br>
-Measures cloud AI adoption (MSFT, GOOGL, AMZN) and software AI monetization.<br>
-Negative hyperscalers = slowing enterprise AI spending.<br><br>
-
-<b>Macro / Risk (25% weight):</b><br>
-Includes volatility (VIX), energy (OIL), trade (BDRY, FXI), defense (ITA), gold (GLD), crypto (BTC), and rates (TNX).<br>
-Positive macro = stable environment for AI growth.<br>
-Negative macro = geopolitical or liquidity stress.<br><br>
-
-<b>Final AI Macro Score:</b><br>
-Weighted average of all three groups.<br>
-<b>Strong AI:</b> > 0.5<br>
-<b>Late-cycle AI:</b> 0–0.5<br>
-<b>Weak AI:</b> < 0
-</div>
-</div>
-
-<div class="card">
-<h3>AI Macro Indicators (Details)</h3>
-
-<div class="group-title">Hardware Contribution</div>
-<div id="grp_hardware" class="grid"></div>
-
-<div class="group-title">Hyperscalers Contribution</div>
-<div id="grp_hyperscalers" class="grid"></div>
-
-<div class="group-title">Macro / Risk Contribution</div>
-<div id="grp_macro" class="grid"></div>
-</div>
-
-</div>
-
-<script>
-/* ================= CORE EXIT SCORE ================= */
-async function loadCore(){
-  const d = await (await fetch("data.json?t=" + Date.now())).json();
-
-  const nvdaCh = +d.nvdaChange;
-  const soxxCh = +d.soxxChange;
-  const vix = +d.vix;
-  const oil = +d.oil;
-
-  document.getElementById("nvda").innerText = `${d.nvda} (${nvdaCh.toFixed(2)}%)`;
-  document.getElementById("soxx").innerText = `${d.soxx} (${soxxCh.toFixed(2)}%)`;
-  document.getElementById("vix").innerText = vix;
-  document.getElementById("oil").innerText = oil;
-  document.getElementById("time").innerText = d.updated;
-
-  const soxxSignal = soxxCh > 0 ? 1 : -1;
-  const nvdaSignal = nvdaCh > 5 ? -1 : 1;
-  const vixSignal = vix > 25 ? -1 : 0;
-  const oilSignal = oil > 95 ? -0.5 : 0;
-
-  const score =
-    0.4*soxxSignal + 0.3*nvdaSignal + 0.2*vixSignal + 0.1*oilSignal;
-
-  document.getElementById("decision").innerHTML =
-    score > 0.5 ? `<span class="hold">HOLD (Strong) (${score.toFixed(2)})</span>` :
-    score > 0 ? `<span class="warning">HOLD (Late) (${score.toFixed(2)})</span>` :
-    score > -0.5 ? `<span class="warning">WARNING (${score.toFixed(2)})</span>` :
-    `<span class="exit">EXIT (${score.toFixed(2)})</span>`;
-
-  document.getElementById("scoreExplain").innerHTML =
-    `SOXX: ${(0.4*soxxSignal).toFixed(2)}<br>
-NVDA: ${(0.3*nvdaSignal).toFixed(2)}<br>
-VIX: ${(0.2*vixSignal).toFixed(2)}<br>
-OIL: ${(0.1*oilSignal).toFixed(2)}<br><br>
-<b>Total CORE Score: ${score.toFixed(2)}</b>`;
+  return {
+    closes: filtered,
+    timestamps: filteredTimestamps
+  };
 }
 
-/* ================= AI MACRO SCORE ================= */
-async function loadAIMacro(){
-  const defs = await (await fetch("ai_macro_indicators.json")).json();
-  const vals = await (await fetch("ai_macro_values.json?t=" + Date.now())).json();
-
-  const groups = {
-    hardware: [],
-    hyperscalers: [],
-    macro: []
-  };
-
-  const tickers = {
-    hardware: [],
-    hyperscalers: [],
-    macro: []
-  };
-
-  defs.forEach(d => {
-    const v = vals.values[d.ticker];
-    if(!v) return;
-
-    const s = v.change > 0 ? 1 : v.change < 0 ? -1 : 0;
-
-    let bucket;
-    if(d.category.includes("Semiconductor") || d.category.includes("GPU") || d.category.includes("CPU"))
-      bucket = "hardware";
-    else if(d.category.includes("Cloud") || d.category.includes("Software"))
-      bucket = "hyperscalers";
-    else
-      bucket = "macro";
-
-    groups[bucket].push(s);
-    tickers[bucket].push(d.ticker);
-
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-<b>${d.ticker}</b> — ${d.name}<br>
-${v.price} (${v.change.toFixed(2)}%)<br>
-<span class="small">${d.logic}</span>
-`;
-    document.getElementById("grp_" + bucket).appendChild(div);
-  });
-
-  const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
-
-  const hw = avg(groups.hardware);
-  const hs = avg(groups.hyperscalers);
-  const ma = avg(groups.macro);
-
-  const macroScore = 0.45*hw + 0.30*hs + 0.25*ma;
-
-  document.getElementById("macroScore").innerHTML =
-    macroScore > 0.5 ? `<span class="hold">Strong AI (${macroScore.toFixed(2)})</span>` :
-    macroScore > 0 ? `<span class="warning">Late-cycle AI (${macroScore.toFixed(2)})</span>` :
-    `<span class="exit">Weak AI (${macroScore.toFixed(2)})</span>`;
-
-  document.getElementById("macroExplain").innerHTML = `
-<b>Hardware (+${(0.45*hw).toFixed(2)}):</b><br>
-Contributors: [${tickers.hardware.join(", ")}]<br>
-${tickers.hardware.length} indicators → avg ${hw.toFixed(2)} × 45%<br><br>
-
-<b>Hyperscalers (+${(0.30*hs).toFixed(2)}):</b><br>
-Contributors: [${tickers.hyperscalers.join(", ")}]<br>
-${tickers.hyperscalers.length} indicators → avg ${hs.toFixed(2)} × 30%<br><br>
-
-<b>Macro / Risk (+${(0.25*ma).toFixed(2)}):</b><br>
-Contributors: [${tickers.macro.join(", ")}]<br>
-${tickers.macro.length} indicators → avg ${ma.toFixed(2)} × 25%<br><br>
-
-<b>Total AI Macro Score: ${macroScore.toFixed(2)}</b>`;
-}
-
-/* ================= VVSM PRICE & POSITION CHART ================= */
-async function loadSMHChart() {
+async function fetchStockData(ticker) {
   try {
-    const data = await (await fetch("smh.json?t=" + Date.now())).json();
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1d&interval=1d`;
+    const res = await fetch(url);
+    const json = await res.json();
+    const result = json.chart?.result?.[0];
+    if (!result) return null;
 
-    const shares = data.shares;
-    const closes = data.closes;
-    const timestamps = data.timestamps.map(t => new Date(t * 1000));
-    const latestPrice = data.latestPriceEUR;
-    const valueEur = data.latestValueEUR;
+    const price = result.regularMarketPrice;
+    const prevClose = result.previousClose;
+    const change = price - prevClose;
+    const changePercent = (change / prevClose * 100);
 
-    document.getElementById("smhValue").innerHTML =
-      `Latest VVSM price: €${latestPrice.toFixed(2)}<br>
-<b>Your position value: €${valueEur.toFixed(2)}</b><br>
-<span class="small">Updated: ${data.updated}</span>`;
-
-    const ctx = document.getElementById("smhChart").getContext("2d");
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: timestamps.map(t => t.toISOString().split("T")[0]),
-        datasets: [{
-          label: "VVSM (VanEck Semiconductor UCITS ETF) price in EUR",
-          data: closes,
-          borderColor: "lime",
-          borderWidth: 2,
-          tension: 0.2,
-          pointRadius: 0
-        }]
-      },
-      options: {
-        plugins: {
-          legend: { labels: { color: "#eee" } }
-        },
-        scales: {
-          x: {
-            ticks: { color: "#aaa" },
-            grid: { color: "#333" }
-          },
-          y: {
-            ticks: { color: "#aaa" },
-            grid: { color: "#333" }
-          }
-        }
-      }
-    });
-  } catch (e) {
-    document.getElementById("smhValue").innerHTML =
-      "VVSM data not available. Run update_smh.js to generate smh.json.";
+    return {
+      price: price.toFixed(2),
+      change: changePercent.toFixed(2)
+    };
+  } catch (err) {
+    console.warn(`Could not fetch ${ticker}:`, err.message);
+    return null;
   }
 }
 
-loadCore();
-loadAIMacro();
-loadSMHChart();
-</script>
+async function run() {
+  try {
+    console.log(`Fetching ${ETF_SYMBOL} history...`);
+    const etf = await fetchYahooChart(ETF_SYMBOL, "1mo", "1d");
 
-</body>
-</html>
+    const latestPrice = etf.closes[etf.closes.length - 1];
+    const latestValueEur = SHARES * latestPrice;
+
+    // Fetch VVSM holdings data
+    console.log("Fetching VVSM holdings...");
+    const holdings = {};
+    for (const stock of VVSM_HOLDINGS) {
+      const data = await fetchStockData(stock.ticker);
+      if (data) {
+        holdings[stock.ticker] = data;
+      }
+    }
+
+    const output = {
+      updated: new Date().toISOString(),
+      symbol: ETF_SYMBOL,
+      name: "VanEck Semiconductor UCITS ETF USD A (XETR: VVSM)",
+      shares: SHARES,
+      latestPriceEUR: latestPrice,
+      latestValueEUR: latestValueEur,
+      timestamps: etf.timestamps,
+      closes: etf.closes,
+      holdings: holdings
+    };
+
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
+    console.log("✅ smh.json updated");
+    console.log(
+      `Latest VVSM: €${latestPrice.toFixed(2)}, Position: €${latestValueEur.toFixed(2)}`
+    );
+    console.log(`Holdings updated: ${Object.keys(holdings).length} stocks`);
+  } catch (err) {
+    console.error("❌ Failed to update VVSM data:", err.message);
+  }
+}
+
+run();
