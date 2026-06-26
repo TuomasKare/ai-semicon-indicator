@@ -10,18 +10,6 @@ const SHARES = "102.6"; // your owned VVSM shares
 // Yahoo symbol for XETR: VVSM is VVSM.DE (priced in EUR)
 const ETF_SYMBOL = "VVSM.DE";
 
-// Top VVSM holdings
-const VVSM_HOLDINGS = [
-  { ticker: "NVDA", name: "NVIDIA" },
-  { ticker: "BROADCOM", name: "Broadcom" },
-  { ticker: "QCOM", name: "Qualcomm" },
-  { ticker: "AMD", name: "Advanced Micro Devices" },
-  { ticker: "INTC", name: "Intel" },
-  { ticker: "ASML", name: "ASML" },
-  { ticker: "TSM", name: "Taiwan Semiconductor" },
-  { ticker: "MU", name: "Micron Technology" }
-];
-
 async function fetchYahooChart(symbol, range = "1mo", interval = "1d") {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=${interval}`;
   const res = await fetch(url);
@@ -45,6 +33,47 @@ async function fetchYahooChart(symbol, range = "1mo", interval = "1d") {
     closes: filtered,
     timestamps: filteredTimestamps
   };
+}
+
+async function fetchETFHoldings(etfSymbol) {
+  try {
+    console.log(`Fetching ${etfSymbol} holdings from Yahoo Finance...`);
+    
+    // Use YahooQuery API endpoint for ETF holdings
+    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${etfSymbol}?modules=holdings`;
+    const res = await fetch(url);
+    const json = await res.json();
+    
+    const holdings = json.quoteSummary?.result?.[0]?.holdings?.holdings;
+    
+    if (!holdings || holdings.length === 0) {
+      throw new Error("No holdings data found");
+    }
+
+    // Extract top holdings (tickers)
+    const topHoldings = holdings.slice(0, 10).map(holding => ({
+      ticker: holding.symbol,
+      name: holding.symbol // Will be updated if we get full name
+    }));
+
+    console.log(`Found ${topHoldings.length} top holdings for ${etfSymbol}`);
+    return topHoldings;
+  } catch (err) {
+    console.warn(`Could not fetch holdings from Yahoo Finance: ${err.message}`);
+    console.log("Using fallback holdings list...");
+    
+    // Fallback to known VVSM holdings
+    return [
+      { ticker: "NVDA", name: "NVIDIA" },
+      { ticker: "BROADCOM", name: "Broadcom" },
+      { ticker: "QCOM", name: "Qualcomm" },
+      { ticker: "AMD", name: "Advanced Micro Devices" },
+      { ticker: "INTC", name: "Intel" },
+      { ticker: "ASML", name: "ASML" },
+      { ticker: "TSM", name: "Taiwan Semiconductor" },
+      { ticker: "MU", name: "Micron Technology" }
+    ];
+  }
 }
 
 async function fetchStockData(ticker) {
@@ -78,10 +107,13 @@ async function run() {
     const latestPrice = etf.closes[etf.closes.length - 1];
     const latestValueEur = SHARES * latestPrice;
 
-    // Fetch VVSM holdings data
-    console.log("Fetching VVSM holdings...");
+    // Dynamically fetch VVSM holdings
+    const vvsmHoldings = await fetchETFHoldings("VVSM");
+
+    // Fetch stock data for each holding
+    console.log("Fetching holdings stock prices...");
     const holdings = {};
-    for (const stock of VVSM_HOLDINGS) {
+    for (const stock of vvsmHoldings) {
       const data = await fetchStockData(stock.ticker);
       if (data) {
         holdings[stock.ticker] = data;
