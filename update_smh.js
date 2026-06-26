@@ -10,6 +10,18 @@ const SHARES = "102.6"; // your owned VVSM shares
 // Yahoo symbol for XETR: VVSM is VVSM.DE (priced in EUR)
 const ETF_SYMBOL = "VVSM.DE";
 
+// Top VVSM holdings
+const VVSM_HOLDINGS = [
+  { ticker: "NVDA", name: "NVIDIA" },
+  { ticker: "BROADCOM", name: "Broadcom" },
+  { ticker: "QCOM", name: "Qualcomm" },
+  { ticker: "AMD", name: "Advanced Micro Devices" },
+  { ticker: "INTC", name: "Intel" },
+  { ticker: "ASML", name: "ASML" },
+  { ticker: "TSM", name: "Taiwan Semiconductor" },
+  { ticker: "MU", name: "Micron Technology" }
+];
+
 async function fetchYahooChart(symbol, range = "1mo", interval = "1d") {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=${interval}`;
   const res = await fetch(url);
@@ -35,6 +47,29 @@ async function fetchYahooChart(symbol, range = "1mo", interval = "1d") {
   };
 }
 
+async function fetchStockData(ticker) {
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1d&interval=1d`;
+    const res = await fetch(url);
+    const json = await res.json();
+    const result = json.chart?.result?.[0];
+    if (!result) return null;
+
+    const price = result.regularMarketPrice;
+    const prevClose = result.previousClose;
+    const change = price - prevClose;
+    const changePercent = (change / prevClose * 100);
+
+    return {
+      price: price.toFixed(2),
+      change: changePercent.toFixed(2)
+    };
+  } catch (err) {
+    console.warn(`Could not fetch ${ticker}:`, err.message);
+    return null;
+  }
+}
+
 async function run() {
   try {
     console.log(`Fetching ${ETF_SYMBOL} history...`);
@@ -42,6 +77,16 @@ async function run() {
 
     const latestPrice = etf.closes[etf.closes.length - 1];
     const latestValueEur = SHARES * latestPrice;
+
+    // Fetch VVSM holdings data
+    console.log("Fetching VVSM holdings...");
+    const holdings = {};
+    for (const stock of VVSM_HOLDINGS) {
+      const data = await fetchStockData(stock.ticker);
+      if (data) {
+        holdings[stock.ticker] = data;
+      }
+    }
 
     const output = {
       updated: new Date().toISOString(),
@@ -51,7 +96,8 @@ async function run() {
       latestPriceEUR: latestPrice,
       latestValueEUR: latestValueEur,
       timestamps: etf.timestamps,
-      closes: etf.closes
+      closes: etf.closes,
+      holdings: holdings
     };
 
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
@@ -59,6 +105,7 @@ async function run() {
     console.log(
       `Latest VVSM: €${latestPrice.toFixed(2)}, Position: €${latestValueEur.toFixed(2)}`
     );
+    console.log(`Holdings updated: ${Object.keys(holdings).length} stocks`);
   } catch (err) {
     console.error("❌ Failed to update VVSM data:", err.message);
   }
