@@ -30,5 +30,10 @@ jobs:
           git config user.email "actions@github.com"
           git add ai_macro_values.json
           git commit -m "auto: update AI macro values" || exit 0
-          git pull --rebase
-          git push
+          git fetch origin main
+          git merge origin/main -m "Merge remote changes" || {
+            git checkout --theirs ai_macro_values.json
+            git add ai_macro_values.json
+            git commit -m "Merge remote changes (keeping remote version)"
+          }
+          git push origin main
