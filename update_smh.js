@@ -10,6 +10,18 @@ const SHARES = "102.6"; // your owned VVSM shares
 // Yahoo symbol for XETR: VVSM is VVSM.DE (priced in EUR)
 const ETF_SYMBOL = "VVSM.DE";
 
+// Fallback VVSM holdings (used if API fetch fails)
+const FALLBACK_HOLDINGS = [
+  { ticker: "NVDA", name: "NVIDIA" },
+  { ticker: "BROADCOM", name: "Broadcom" },
+  { ticker: "QCOM", name: "Qualcomm" },
+  { ticker: "AMD", name: "Advanced Micro Devices" },
+  { ticker: "INTC", name: "Intel" },
+  { ticker: "ASML", name: "ASML" },
+  { ticker: "TSM", name: "Taiwan Semiconductor" },
+  { ticker: "MU", name: "Micron Technology" }
+];
+
 async function fetchYahooChart(symbol, range = "1mo", interval = "1d") {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=${interval}`;
   const res = await fetch(url);
@@ -37,42 +49,32 @@ async function fetchYahooChart(symbol, range = "1mo", interval = "1d") {
 
 async function fetchETFHoldings(etfSymbol) {
   try {
-    console.log(`Fetching ${etfSymbol} holdings from Yahoo Finance...`);
+    console.log(`Fetching ${etfSymbol} holdings...`);
     
-    // Use YahooQuery API endpoint for ETF holdings
+    // Try to fetch from Yahoo Finance holdings endpoint
     const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${etfSymbol}?modules=holdings`;
     const res = await fetch(url);
     const json = await res.json();
     
-    const holdings = json.quoteSummary?.result?.[0]?.holdings?.holdings;
+    // Navigate the API response carefully
+    const holdingsData = json?.quoteSummary?.result?.[0]?.holdings?.holdings;
     
-    if (!holdings || holdings.length === 0) {
-      throw new Error("No holdings data found");
+    if (holdingsData && Array.isArray(holdingsData) && holdingsData.length > 0) {
+      // Extract ticker symbols from holdings
+      const topHoldings = holdingsData.slice(0, 10).map(holding => ({
+        ticker: holding.symbol,
+        name: holding.symbol
+      }));
+
+      console.log(`✅ Fetched ${topHoldings.length} holdings from Yahoo Finance`);
+      return topHoldings;
+    } else {
+      throw new Error("No holdings data in response");
     }
-
-    // Extract top holdings (tickers)
-    const topHoldings = holdings.slice(0, 10).map(holding => ({
-      ticker: holding.symbol,
-      name: holding.symbol // Will be updated if we get full name
-    }));
-
-    console.log(`Found ${topHoldings.length} top holdings for ${etfSymbol}`);
-    return topHoldings;
   } catch (err) {
-    console.warn(`Could not fetch holdings from Yahoo Finance: ${err.message}`);
-    console.log("Using fallback holdings list...");
-    
-    // Fallback to known VVSM holdings
-    return [
-      { ticker: "NVDA", name: "NVIDIA" },
-      { ticker: "BROADCOM", name: "Broadcom" },
-      { ticker: "QCOM", name: "Qualcomm" },
-      { ticker: "AMD", name: "Advanced Micro Devices" },
-      { ticker: "INTC", name: "Intel" },
-      { ticker: "ASML", name: "ASML" },
-      { ticker: "TSM", name: "Taiwan Semiconductor" },
-      { ticker: "MU", name: "Micron Technology" }
-    ];
+    console.warn(`⚠️  Could not fetch holdings from Yahoo Finance: ${err.message}`);
+    console.log(`Using ${FALLBACK_HOLDINGS.length} fallback holdings...`);
+    return FALLBACK_HOLDINGS;
   }
 }
 
@@ -133,7 +135,7 @@ async function run() {
     };
 
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
-    console.log("✅ smh.json updated");
+    console.log("✅ smh.json updated successfully");
     console.log(
       `Latest VVSM: €${latestPrice.toFixed(2)}, Position: €${latestValueEur.toFixed(2)}`
     );
