@@ -1,114 +1,182 @@
-const fs = require("fs");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Semiconductor Indicator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; margin-bottom: 10px; }
+        .status { color: #666; font-size: 14px; margin-bottom: 20px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .card h3 { margin: 0 0 10px 0; color: #333; }
+        .card-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0066cc;
+        }
+        .change {
+            font-size: 14px;
+            margin-top: 5px;
+            padding: 5px 0;
+        }
+        .change.up { color: #00aa00; }
+        .change.down { color: #cc0000; }
+        .holdings-section h2 { margin-top: 30px; }
+        .holdings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .holding-card {
+            background: #f0f8ff;
+            border-left: 3px solid #0066cc;
+            padding: 12px;
+            border-radius: 4px;
+        }
+        .holding-card .ticker { font-weight: bold; color: #0066cc; }
+        .holding-card .price { font-size: 18px; margin: 5px 0; }
+        .error { color: #cc0000; padding: 10px; background: #ffe6e6; border-radius: 4px; }
+        .loading { color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 AI & Semiconductor Indicator</h1>
+        <div class="status">Last updated: <span id="updated">Loading...</span></div>
 
-// fetch for Node environment
-const fetch = (...args) =>
-  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+        <div class="grid">
+            <div class="card">
+                <h3>NVIDIA (NVDA)</h3>
+                <div class="card-value" id="nvda">-</div>
+                <div class="change" id="nvda-change"></div>
+            </div>
+            <div class="card">
+                <h3>Semiconductor ETF (SOXX)</h3>
+                <div class="card-value" id="soxx">-</div>
+                <div class="change" id="soxx-change"></div>
+            </div>
+            <div class="card">
+                <h3>VIX (Volatility Index)</h3>
+                <div class="card-value" id="vix">-</div>
+            </div>
+            <div class="card">
+                <h3>Oil (CL=F)</h3>
+                <div class="card-value" id="oil">-</div>
+            </div>
+            <div class="card">
+                <h3>VVSM (Semiconductor ETF)</h3>
+                <div class="card-value" id="vvsm">-</div>
+                <div id="vvsm-position" style="font-size: 14px; margin-top: 5px; color: #666;"></div>
+            </div>
+        </div>
 
-const OUTPUT_FILE = "smh.json";
-const SHARES = "102.6"; // your owned VVSM shares
+        <div class="holdings-section">
+            <h2>🏢 VVSM Top Holdings</h2>
+            <div class="holdings-grid" id="holdings-grid">
+                <div class="loading">Loading holdings...</div>
+            </div>
+        </div>
 
-// Yahoo symbol for XETR: VVSM is VVSM.DE (priced in EUR)
-const ETF_SYMBOL = "VVSM.DE";
+        <div id="error-message"></div>
+    </div>
 
-// Top VVSM holdings
-const VVSM_HOLDINGS = [
-  { ticker: "NVDA", name: "NVIDIA" },
-  { ticker: "BROADCOM", name: "Broadcom" },
-  { ticker: "QCOM", name: "Qualcomm" },
-  { ticker: "AMD", name: "Advanced Micro Devices" },
-  { ticker: "INTC", name: "Intel" },
-  { ticker: "ASML", name: "ASML" },
-  { ticker: "TSM", name: "Taiwan Semiconductor" },
-  { ticker: "MU", name: "Micron Technology" }
-];
+    <script>
+        async function fetchFromGitHub(filePath) {
+            try {
+                const response = await fetch(
+                    `https://raw.githubusercontent.com/TuomasKare/ai-semicon-indicator/main/${filePath}`
+                );
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (err) {
+                console.error(`Failed to fetch ${filePath}:`, err.message);
+                return null;
+            }
+        }
 
-async function fetchYahooChart(symbol, range = "1mo", interval = "1d") {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=${interval}`;
-  const res = await fetch(url);
-  const json = await res.json();
-  const result = json.chart?.result?.[0];
-  if (!result) throw new Error(`No data for ${symbol}`);
+        async function updatePage() {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.innerHTML = '';
 
-  const closes = result.indicators.quote[0].close;
-  const timestamps = result.timestamp;
+            try {
+                // Fetch data
+                const data = await fetchFromGitHub('data.json');
+                const smhData = await fetchFromGitHub('smh.json');
 
-  const filtered = [];
-  const filteredTimestamps = [];
-  for (let i = 0; i < closes.length; i++) {
-    if (closes[i] != null) {
-      filtered.push(Number(closes[i].toFixed(2)));
-      filteredTimestamps.push(timestamps[i]);
-    }
-  }
+                if (!data || !smhData) {
+                    throw new Error('Could not load data files');
+                }
 
-  return {
-    closes: filtered,
-    timestamps: filteredTimestamps
-  };
-}
+                // Update main indicators
+                document.getElementById('updated').textContent = new Date(data.updated).toLocaleString();
+                
+                document.getElementById('nvda').textContent = `$${data.nvda}`;
+                const nvdaClass = parseFloat(data.nvdaChange) >= 0 ? 'up' : 'down';
+                document.getElementById('nvda-change').innerHTML = 
+                    `<span class="change ${nvdaClass}">${data.nvdaChange}% (5d)</span>`;
+                
+                document.getElementById('soxx').textContent = `$${data.soxx}`;
+                const soxxClass = parseFloat(data.soxxChange) >= 0 ? 'up' : 'down';
+                document.getElementById('soxx-change').innerHTML = 
+                    `<span class="change ${soxxClass}">${data.soxxChange}% (5d)</span>`;
+                
+                document.getElementById('vix').textContent = data.vix;
+                document.getElementById('oil').textContent = `$${data.oil}`;
 
-async function fetchStockData(ticker) {
-  try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1d&interval=1d`;
-    const res = await fetch(url);
-    const json = await res.json();
-    const result = json.chart?.result?.[0];
-    if (!result) return null;
+                // Update VVSM
+                document.getElementById('vvsm').textContent = `€${smhData.latestPriceEUR}`;
+                document.getElementById('vvsm-position').textContent = 
+                    `Position: €${smhData.latestValueEUR}`;
 
-    const price = result.regularMarketPrice;
-    const prevClose = result.previousClose;
-    const change = price - prevClose;
-    const changePercent = (change / prevClose * 100);
+                // Update holdings
+                const holdingsGrid = document.getElementById('holdings-grid');
+                holdingsGrid.innerHTML = '';
+                
+                for (const [ticker, stockData] of Object.entries(smhData.holdings || {})) {
+                    const changeClass = parseFloat(stockData.change) >= 0 ? 'up' : 'down';
+                    const holdingHtml = `
+                        <div class="holding-card">
+                            <div class="ticker">${ticker}</div>
+                            <div class="price">$${stockData.price}</div>
+                            <div class="change ${changeClass}">${stockData.change}% (1d)</div>
+                        </div>
+                    `;
+                    holdingsGrid.innerHTML += holdingHtml;
+                }
 
-    return {
-      price: price.toFixed(2),
-      change: changePercent.toFixed(2)
-    };
-  } catch (err) {
-    console.warn(`Could not fetch ${ticker}:`, err.message);
-    return null;
-  }
-}
+            } catch (err) {
+                errorDiv.innerHTML = `<div class="error">❌ Error: ${err.message}</div>`;
+                console.error('Page update error:', err);
+            }
+        }
 
-async function run() {
-  try {
-    console.log(`Fetching ${ETF_SYMBOL} history...`);
-    const etf = await fetchYahooChart(ETF_SYMBOL, "1mo", "1d");
-
-    const latestPrice = etf.closes[etf.closes.length - 1];
-    const latestValueEur = SHARES * latestPrice;
-
-    // Fetch VVSM holdings data
-    console.log("Fetching VVSM holdings...");
-    const holdings = {};
-    for (const stock of VVSM_HOLDINGS) {
-      const data = await fetchStockData(stock.ticker);
-      if (data) {
-        holdings[stock.ticker] = data;
-      }
-    }
-
-    const output = {
-      updated: new Date().toISOString(),
-      symbol: ETF_SYMBOL,
-      name: "VanEck Semiconductor UCITS ETF USD A (XETR: VVSM)",
-      shares: SHARES,
-      latestPriceEUR: latestPrice,
-      latestValueEUR: latestValueEur,
-      timestamps: etf.timestamps,
-      closes: etf.closes,
-      holdings: holdings
-    };
-
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
-    console.log("✅ smh.json updated");
-    console.log(
-      `Latest VVSM: €${latestPrice.toFixed(2)}, Position: €${latestValueEur.toFixed(2)}`
-    );
-    console.log(`Holdings updated: ${Object.keys(holdings).length} stocks`);
-  } catch (err) {
-    console.error("❌ Failed to update VVSM data:", err.message);
-  }
-}
-
-run();
+        // Update on page load and every 5 minutes
+        updatePage();
+        setInterval(updatePage, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
