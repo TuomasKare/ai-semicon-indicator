@@ -13,6 +13,14 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 .small { color:#aaa; font-size:13px;}
 .grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
 .group-title { margin-top:20px; font-weight:bold; font-size:16px;}
+.holdings-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; }
+.holding-item { background:#1a1a1a; padding:12px; border-radius:6px; border-left:3px solid #00aa00; }
+.holding-item.down { border-left:3px solid #ff3333; }
+.holding-ticker { font-weight:bold; color:#88ff88; font-size:14px; }
+.holding-price { font-size:16px; margin:5px 0; }
+.holding-change { font-size:12px; }
+.change-up { color:#00ff00; }
+.change-down { color:#ff3333; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -27,6 +35,14 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
   <h2>VanEck Semiconductor UCITS ETF (VVSM) — Your Position</h2>
   <canvas id="smhChart" height="120"></canvas>
   <div id="smhValue" class="small" style="margin-top:10px;"></div>
+</div>
+
+<!-- ================= VVSM HOLDINGS ================= -->
+<div class="card">
+  <h3>VVSM Top Holdings</h3>
+  <div id="vvsmHoldings" class="holdings-grid">
+    <div style="grid-column: 1/-1; color:#aaa; font-style:italic;">Loading holdings...</div>
+  </div>
 </div>
 
 <!-- ================= CORE EXIT INDICATOR ================= -->
@@ -121,6 +137,41 @@ Weighted average of all three groups.<br>
 </div>
 
 <script>
+/* ================= VVSM HOLDINGS DISPLAY ================= */
+async function loadVVSMHoldings() {
+  try {
+    const data = await (await fetch("smh.json?t=" + Date.now())).json();
+    const holdingsDiv = document.getElementById("vvsmHoldings");
+    
+    if (!data.holdings || Object.keys(data.holdings).length === 0) {
+      holdingsDiv.innerHTML = '<div style="grid-column: 1/-1; color:#aaa; font-style:italic;">No holdings data available. Run update_smh.js to fetch holdings.</div>';
+      return;
+    }
+    
+    holdingsDiv.innerHTML = '';
+    
+    for (const [ticker, stockData] of Object.entries(data.holdings)) {
+      const change = parseFloat(stockData.change);
+      const isNegative = change < 0;
+      const changeClass = isNegative ? 'down' : '';
+      const changeColor = isNegative ? 'change-down' : 'change-up';
+      
+      const holdingHtml = `
+        <div class="holding-item ${changeClass}">
+          <div class="holding-ticker">${ticker}</div>
+          <div class="holding-price">$${stockData.price}</div>
+          <div class="holding-change"><span class="${changeColor}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</span></div>
+        </div>
+      `;
+      
+      holdingsDiv.innerHTML += holdingHtml;
+    }
+  } catch (e) {
+    document.getElementById("vvsmHoldings").innerHTML = 
+      '<div style="grid-column: 1/-1; color:#ff6666;">Error loading holdings data</div>';
+  }
+}
+
 /* ================= CORE EXIT SCORE ================= */
 async function loadCore(){
   const d = await (await fetch("data.json?t=" + Date.now())).json();
@@ -286,6 +337,7 @@ async function loadSMHChart() {
 loadCore();
 loadAIMacro();
 loadSMHChart();
+loadVVSMHoldings();
 </script>
 
 </body>
