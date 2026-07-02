@@ -49,7 +49,7 @@ async function fetchYahooChart(symbol, range = "1mo", interval = "1d") {
 
 async function fetchETFHoldings(etfSymbol) {
   try {
-    console.log(`Fetching ${etfSymbol} holdings...`);
+    console.log(`Fetching ${etfSymbol} holdings from Yahoo Finance...`);
     
     // Try to fetch from Yahoo Finance holdings endpoint
     const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${etfSymbol}?modules=holdings`;
@@ -69,11 +69,12 @@ async function fetchETFHoldings(etfSymbol) {
       console.log(`✅ Fetched ${topHoldings.length} holdings from Yahoo Finance`);
       return topHoldings;
     } else {
-      throw new Error("No holdings data in response");
+      console.warn(`⚠️  No holdings data in Yahoo Finance response. Using fallback holdings.`);
+      return FALLBACK_HOLDINGS;
     }
   } catch (err) {
     console.warn(`⚠️  Could not fetch holdings from Yahoo Finance: ${err.message}`);
-    console.log(`Using ${FALLBACK_HOLDINGS.length} fallback holdings...`);
+    console.log(`Using ${FALLBACK_HOLDINGS.length} fallback holdings instead...`);
     return FALLBACK_HOLDINGS;
   }
 }
@@ -84,7 +85,10 @@ async function fetchStockData(ticker) {
     const res = await fetch(url);
     const json = await res.json();
     const result = json.chart?.result?.[0];
-    if (!result) return null;
+    if (!result) {
+      console.warn(`No data for ${ticker}`);
+      return null;
+    }
 
     const price = result.regularMarketPrice;
     const prevClose = result.previousClose;
@@ -119,6 +123,9 @@ async function run() {
       const data = await fetchStockData(stock.ticker);
       if (data) {
         holdings[stock.ticker] = data;
+        console.log(`  ${stock.ticker}: $${data.price} (${data.change}%)`);
+      } else {
+        console.log(`  ${stock.ticker}: Failed to fetch data`);
       }
     }
 
@@ -142,6 +149,7 @@ async function run() {
     console.log(`Holdings updated: ${Object.keys(holdings).length} stocks`);
   } catch (err) {
     console.error("❌ Failed to update VVSM data:", err.message);
+    process.exit(1);
   }
 }
 
