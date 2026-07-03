@@ -1,9 +1,13 @@
 {
-  "updated": "2026-07-03T21:31:40.914Z",
+  "updated": "2026-07-03T21:44:37.180Z",
   "values": {
     "NVDA": {
       "price": 194.83,
       "change": 1.19
+    },
+    "MSFT": {
+      "price": 390.49,
+      "change": 4.7
     },
     "AVGO": {
       "price": 360.45,
@@ -110,8 +114,8 @@
       "change": 1.86
     },
     "BTC-USD": {
-      "price": 62542.93,
-      "change": 4
+      "price": 62530.17,
+      "change": 3.98
     },
     "DX-Y.NYB": {
       "price": 100.86,
@@ -122,7 +126,5 @@
       "change": 0
     }
   },
-  "failed": [
-    "MSFT"
-  ]
+  "failed": []
 }
