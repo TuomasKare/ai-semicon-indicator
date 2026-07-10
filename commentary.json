@@ -1,0 +1,50 @@
+{
+  "date": "2026-07-10",
+  "overallSignal": "YELLOW",
+  "summary": "VVSM:n pitkän aikavälin ajurit ovat edelleen kiinnostavat AI-datakeskusinvestointien, HBM/DRAM-muistin, GPU-kysynnän ja puolijohteiden tuotantoketjun vuoksi. Lyhyen aikavälin riski on kuitenkin koholla, koska salkku on 100 % yhdessä sektorissa, VVSM on noussut voimakkaasti ja markkina on jo hermostunut AI CAPEXin kestävyyden ympärillä.",
+  "copilotView": "Salkku on 100 % VVSM:ssä. Alkuperäinen sijoitus oli 80 000 euroa, huippu noin 112 000 euroa ja nykyinen arvo noin 100 000 euroa. Olet edelleen noin 25 % voitolla alkuperäisestä sijoituksesta, mutta noin 10,7 % alle huipun. En pitäisi tätä laskua yksin myyntisignaalina, mutta korkea sektorikeskittymä tekee riskitasosta selvästi korkean. Seuraan erityisesti hyperscaler CAPEXia, Nvidia datacenter -kasvua, TSMC:n ohjeistusta, Micronin HBM/DRAM-kommentteja sekä Fedin korkoviestintää.",
+  "signals": {
+    "aiCapex": "YELLOW",
+    "nvidia": "GREEN",
+    "tsmc": "GREEN",
+    "memory": "YELLOW",
+    "rates": "YELLOW",
+    "midterms": "YELLOW"
+  },
+  "driverComments": {
+    "aiCapex": "AI CAPEX on tärkein VVSM-ajuri. Jos Microsoft, Amazon, Alphabet ja Meta jatkavat datakeskusinvestointien kasvattamista, puolijohdesektorin kysyntätarina pysyy vahvana. Jos CAPEX-ohjeistukset heikkenevät, riski kasvaa nopeasti.",
+    "nvidia": "Nvidia on keskeinen kysyntäindikaattori AI-kiihdyttimille. Seuraa datacenter revenue -kasvua, tilauskantaa, toimituskommentteja ja mahdollisia merkkejä asiakkaiden investointien lykkäämisestä.",
+    "tsmc": "TSMC kertoo todellisesta tuotantokysynnästä. Käyttöaste, advanced node -kysyntä ja johdon ohjeistus ovat tärkeimmät seurattavat asiat.",
+    "memory": "Micron ja muistimarkkina ovat tärkeitä, koska HBM ja DRAM hyötyvät AI-palvelimista. Hintojen lasku, varastojen kasvu tai heikentyvä ohjeistus olisi varoitusmerkki.",
+    "rates": "Korkeat tai nousevat korot painavat yleensä kasvuosakkeiden arvostuksia. Seuraa Fedin viestintää ja USA:n 10 vuoden korkoa.",
+    "midterms": "Välivaalivuosien kesä ja alkusyksy ovat historiallisesti usein olleet ailahtelevia. Tämä ei yksin ole syy myydä, mutta lisää lyhyen aikavälin volatiliteettiriskiä."
+  },
+  "portfolio": {
+    "instrument": "VanEck Semiconductor UCITS ETF / VVSM",
+    "currentValueEUR": 100000,
+    "initialInvestmentEUR": 80000,
+    "peakValueEUR": 112000,
+    "currentGainEUR": 20000,
+    "currentGainPct": 25.0,
+    "drawdownFromPeakEUR": -12000,
+    "drawdownFromPeakPct": -10.7,
+    "portfolioConcentration": "100 % VVSM",
+    "riskComment": "Tuotto on edelleen selvästi positiivinen, mutta 100 % paino yhdessä puolijohde-ETF:ssä on korkea sektoririski. Olennaista ei ole vain välivaaliriski, vaan koko AI/semiconductor-syklin kestävyys."
+  },
+  "watchlist": [
+    "Microsoft, Amazon, Alphabet ja Meta: CAPEX-ohjeistus ja datakeskusinvestointien kasvu",
+    "Nvidia: datacenter revenue, tilauskanta, GPU-toimitusajat ja johdon kysyntäkommentit",
+    "TSMC: käyttöaste, advanced nodes -kysyntä, liikevaihdon ohjeistus ja asiakaskysyntä",
+    "Micron: HBM/DRAM-hinnat, varastotaso ja AI-muistikysynnän kommentit",
+    "ASML, AMAT ja LRCX: tilauskanta ja puolijohdekapasiteetin investoinnit",
+    "Fed ja USA:n 10 vuoden korko: vaikutus kasvuosakkeiden arvostuksiin",
+    "Välivaalivuoden kesä-syksy: volatiliteetti, mutta ei yksin myyntisignaali",
+    "VVSM:n oma tekninen taso suhteessa 80 000 euron hankintahintaan ja 112 000 euron huippuun"
+  ],
+  "triggerLevels": {
+    "greenScenario": "CAPEX kasvaa, Nvidia/TSMC ohjeistavat vahvasti ja korot eivät nouse selvästi.",
+    "yellowScenario": "CAPEX kasvaa mutta hidastuu, sektorissa on 10-20 % korjausliikkeitä ja markkina epäilee AI-investointien tuottoa.",
+    "redScenario": "Hyperscalerit leikkaavat CAPEXia, Nvidia tai TSMC antaa selvästi heikon ohjeistuksen, muistimarkkina kääntyy alas tai korot nousevat nopeasti."
+  },
+  "disclaimer": "Tämä kommentti on oma markkinaseurantamuistio eikä sijoitusneuvo. Päätökset tulee tehdä oman riskinsietokyvyn, sijoitushorisontin ja kokonaistilanteen perusteella."
+}
