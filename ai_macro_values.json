@@ -1,9 +1,13 @@
 {
-  "updated": "2026-07-15T21:00:46.046Z",
+  "updated": "2026-07-15T21:39:23.568Z",
   "values": {
     "NVDA": {
       "price": 212.5,
       "change": 4.79
+    },
+    "MSFT": {
+      "price": 395.63,
+      "change": 2.93
     },
     "AVGO": {
       "price": 394.28,
@@ -82,8 +86,8 @@
       "change": -1.07
     },
     "CL=F": {
-      "price": 80.28,
-      "change": 12.42
+      "price": 80.24,
+      "change": 12.37
     },
     "BOTZ": {
       "price": 36.03,
@@ -110,19 +114,17 @@
       "change": -2.35
     },
     "BTC-USD": {
-      "price": 64932.15,
-      "change": 1.77
+      "price": 64766.55,
+      "change": 1.51
     },
     "DX-Y.NYB": {
-      "price": 100.52,
-      "change": -0.45
+      "price": 100.5,
+      "change": -0.46
     },
     "^TNX": {
       "price": 4.55,
       "change": 0.13
     }
   },
-  "failed": [
-    "MSFT"
-  ]
+  "failed": []
 }
