@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-21T10:00:15.996Z",
+  "updated": "2026-07-21T11:18:33.029Z",
   "values": {
     "NVDA": {
       "price": 203.28,
@@ -24,6 +24,10 @@
     "META": {
       "price": 645.85,
       "change": -2.3
+    },
+    "THNQ": {
+      "price": 84.2,
+      "change": -4.51
     },
     "SMH": {
       "price": 558.83,
@@ -57,6 +61,10 @@
       "price": 97.06,
       "change": -9.93
     },
+    "AMD": {
+      "price": 503.57,
+      "change": -8.13
+    },
     "ARM": {
       "price": 269.61,
       "change": -4.11
@@ -74,12 +82,12 @@
       "change": 3.73
     },
     "^VIX": {
-      "price": 17.56,
-      "change": 12.06
+      "price": 17.67,
+      "change": 12.76
     },
     "CL=F": {
-      "price": 82.92,
-      "change": 5.03
+      "price": 83.46,
+      "change": 5.71
     },
     "BOTZ": {
       "price": 34.25,
@@ -106,20 +114,17 @@
       "change": -5.53
     },
     "BTC-USD": {
-      "price": 66257.99,
-      "change": 3.69
+      "price": 66198.07,
+      "change": 3.6
     },
     "DX-Y.NYB": {
-      "price": 100.91,
-      "change": 0.18
+      "price": 100.96,
+      "change": 0.23
     },
     "^TNX": {
       "price": 4.6,
       "change": 0.28
     }
   },
-  "failed": [
-    "THNQ",
-    "AMD"
-  ]
+  "failed": []
 }
