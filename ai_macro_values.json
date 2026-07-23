@@ -1,129 +1,129 @@
 {
-  "updated": "2026-07-23T16:02:34.802Z",
+  "updated": "2026-07-23T17:19:26.663Z",
   "values": {
     "NVDA": {
-      "price": 208.4,
-      "change": 2.75
+      "price": 209.95,
+      "change": 3.52
     },
     "MSFT": {
-      "price": 380.64,
-      "change": -3.35
+      "price": 381.04,
+      "change": -3.25
     },
     "AVGO": {
-      "price": 389.15,
-      "change": 4.94
+      "price": 391.8,
+      "change": 5.65
     },
     "GOOGL": {
-      "price": 319.46,
-      "change": -7.87
+      "price": 320.27,
+      "change": -7.64
     },
     "AMZN": {
-      "price": 233.91,
-      "change": -5.39
+      "price": 234.35,
+      "change": -5.21
     },
     "META": {
-      "price": 602.56,
-      "change": -6.73
+      "price": 605.6,
+      "change": -6.26
     },
     "THNQ": {
-      "price": 83.68,
-      "change": -0.04
+      "price": 84.05,
+      "change": 0.41
     },
     "SMH": {
-      "price": 578.86,
-      "change": 4.01
+      "price": 580.7,
+      "change": 4.34
     },
     "SOXX": {
-      "price": 549.06,
-      "change": 5.22
+      "price": 550.28,
+      "change": 5.46
     },
     "XSD": {
-      "price": 519.13,
-      "change": 3.79
+      "price": 523.33,
+      "change": 4.63
     },
     "TSM": {
-      "price": 415.5,
-      "change": 4.3
+      "price": 417.7,
+      "change": 4.85
     },
     "ASML": {
-      "price": 1799.85,
-      "change": 2.99
+      "price": 1804.46,
+      "change": 3.25
     },
     "AMAT": {
-      "price": 564.79,
-      "change": 6.63
+      "price": 563.86,
+      "change": 6.46
     },
     "LRCX": {
-      "price": 320.04,
-      "change": 2.15
+      "price": 320.83,
+      "change": 2.4
     },
     "INTC": {
-      "price": 101.49,
-      "change": 6.79
+      "price": 100.96,
+      "change": 6.23
     },
     "AMD": {
-      "price": 542,
-      "change": 9.33
+      "price": 533.05,
+      "change": 7.52
     },
     "ARM": {
-      "price": 277.99,
-      "change": 4.04
+      "price": 281.89,
+      "change": 5.5
     },
     "QCOM": {
-      "price": 169.24,
-      "change": -1.48
+      "price": 169.57,
+      "change": -1.29
     },
     "MU": {
-      "price": 995.8,
-      "change": 17.3
+      "price": 997.5,
+      "change": 17.5
     },
     "AAPL": {
-      "price": 320.76,
-      "change": -3.89
+      "price": 320.34,
+      "change": -4.02
     },
     "^VIX": {
-      "price": 19.97,
-      "change": 6.39
+      "price": 19.43,
+      "change": 3.52
     },
     "CL=F": {
-      "price": 91.96,
-      "change": 10.49
+      "price": 92.52,
+      "change": 11.16
     },
     "BOTZ": {
-      "price": 34.28,
-      "change": -0.35
+      "price": 34.34,
+      "change": -0.19
     },
     "ITA": {
-      "price": 238.35,
-      "change": 3.3
+      "price": 237.84,
+      "change": 3.08
     },
     "BDRY": {
-      "price": 12.78,
-      "change": 0.99
+      "price": 12.8,
+      "change": 1.07
     },
     "FXI": {
-      "price": 34.47,
-      "change": 0.98
+      "price": 34.46,
+      "change": 0.95
     },
     "GLD": {
-      "price": 371.55,
-      "change": 0.85
+      "price": 371.18,
+      "change": 0.75
     },
     "GDX": {
-      "price": 74.54,
-      "change": 4.51
+      "price": 75.07,
+      "change": 5.25
     },
     "BTC-USD": {
-      "price": 64828.48,
-      "change": 0.21
+      "price": 64692.53,
+      "change": 0
     },
     "DX-Y.NYB": {
-      "price": 101.49,
-      "change": 0.5
+      "price": 101.43,
+      "change": 0.43
     },
     "^TNX": {
       "price": 4.7,
-      "change": 3.52
+      "change": 3.48
     }
   },
   "failed": []
