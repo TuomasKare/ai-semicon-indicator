@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-25T08:51:57.382Z",
+  "updated": "2026-07-25T10:25:02.753Z",
   "values": {
     "NVDA": {
       "price": 206.84,
@@ -66,24 +66,24 @@
       "change": 3.65
     },
     "ARM": {
-      "price": 260.01,
-      "change": -3.56
+      "price": 283.04,
+      "change": 4.98
     },
     "QCOM": {
-      "price": 166.97,
-      "change": -1.97
+      "price": 171.11,
+      "change": 0.46
     },
     "MU": {
       "price": 920.95,
       "change": 6.41
     },
     "AAPL": {
-      "price": 333.02,
-      "change": 1.97
+      "price": 321.66,
+      "change": -1.51
     },
     "^VIX": {
-      "price": 18.58,
-      "change": -0.38
+      "price": 18.7,
+      "change": 0.27
     },
     "CL=F": {
       "price": 89.31,
@@ -114,8 +114,8 @@
       "change": 6.35
     },
     "BTC-USD": {
-      "price": 63804.69,
-      "change": -4.06
+      "price": 63966.44,
+      "change": -3.82
     },
     "DX-Y.NYB": {
       "price": 101.47,
