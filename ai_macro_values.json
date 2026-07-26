@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-26T10:52:59.582Z",
+  "updated": "2026-07-26T11:18:58.242Z",
   "values": {
     "NVDA": {
       "price": 206.84,
@@ -42,8 +42,8 @@
       "change": -1.41
     },
     "TSM": {
-      "price": 403.41,
-      "change": 0.28
+      "price": 415.58,
+      "change": 3.3
     },
     "ASML": {
       "price": 1757.09,
@@ -114,8 +114,8 @@
       "change": 6.35
     },
     "BTC-USD": {
-      "price": 64462.57,
-      "change": -2.48
+      "price": 64457.73,
+      "change": -2.49
     },
     "DX-Y.NYB": {
       "price": 101.47,
