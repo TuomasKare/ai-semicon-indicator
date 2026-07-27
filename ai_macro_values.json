@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-26T23:13:29.662Z",
+  "updated": "2026-07-27T00:11:28.310Z",
   "values": {
     "NVDA": {
       "price": 206.84,
@@ -86,8 +86,8 @@
       "change": -0.38
     },
     "CL=F": {
-      "price": 84.95,
-      "change": 0.05
+      "price": 84.58,
+      "change": -0.39
     },
     "BOTZ": {
       "price": 33.83,
@@ -114,12 +114,12 @@
       "change": 6.35
     },
     "BTC-USD": {
-      "price": 65377.85,
-      "change": -1.09
+      "price": 65125.91,
+      "change": 0.12
     },
     "DX-Y.NYB": {
-      "price": 101.31,
-      "change": 0.13
+      "price": 101.24,
+      "change": 0.06
     },
     "^TNX": {
       "price": 4.68,
