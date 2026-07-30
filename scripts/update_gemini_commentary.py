@@ -20,16 +20,20 @@ Focus on:
 
 Write in Finnish.
 Be concise.
+
 Give:
-1. short summary
-2. bullish factors
-3. bearish risks
-4. final view
+1. Short summary
+2. Bullish factors
+3. Bearish risks
+4. Final view
 
 Do not give personal financial advice.
 """
 
-url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
+url = (
+    f"https://generativelanguage.googleapis.com/v1beta/models/"
+    f"{MODEL}:generateContent?key={API_KEY}"
+)
 
 payload = {
     "contents": [
@@ -69,7 +73,9 @@ except Exception as e:
     text = f"Gemini commentary update failed: {str(e)}"
 
 output = {
-    "updated_at_utc": datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+    "updated_at_utc": datetime.datetime.utcnow().replace(
+        microsecond=0
+    ).isoformat() + "Z",
     "source": "Gemini API via GitHub Actions",
     "model": MODEL,
     "commentary": text
@@ -79,4 +85,3 @@ with open("commentary.json", "w", encoding="utf-8") as f:
     json.dump(output, f, ensure_ascii=False, indent=2)
 
 print("commentary.json updated")
-`
