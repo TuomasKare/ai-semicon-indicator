@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <title>AI Semiconductor EXIT Dashboard</title>
+<div class="card">
+  <h2>MASTER EXIT SIGNAL</h2>
+  <div id="masterExit" style="font-size:42px;font-weight:bold;">
+    Loading...
+  </div>
+</div>
 <style>
 body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 .container { max-width:1200px; margin:auto; }
@@ -35,6 +41,13 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
   <h2>VanEck Semiconductor UCITS ETF (VVSM) — Your Position</h2>
   <canvas id="smhChart" height="120"></canvas>
   <div id="smhValue" class="small" style="margin-top:10px;"></div>
+</div>
+
+  <div class="card">
+  <h2>VVSM Trend Risk</h2>
+  <div id="vvsmRisk">
+    Loading...
+  </div>
 </div>
 
 <!-- ================= VVSM HOLDINGS ================= -->
@@ -308,53 +321,148 @@ ${tickers.macro.length} indicators → avg ${ma.toFixed(2)} × 25%<br><br>
 
 /* ================= VVSM PRICE & POSITION CHART ================= */
 async function loadSMHChart() {
+
   try {
-    const data = await (await fetch("smh.json?t=" + Date.now())).json();
 
-    const shares = data.shares;
+    const data =
+      await (
+        await fetch(
+          "smh.json?t=" + Date.now()
+        )
+      ).json();
+
     const closes = data.closes;
-    const timestamps = data.timestamps.map(t => new Date(t * 1000));
-    const latestPrice = data.latestPriceEUR;
-    const valueEur = data.latestValueEUR;
 
-    document.getElementById("smhValue").innerHTML =
+    const timestamps =
+      data.timestamps.map(
+        t => new Date(t * 1000)
+      );
+
+    const latestPrice =
+      data.latestPriceEUR;
+
+    const valueEur =
+      data.latestValueEUR;
+
+    const ath =
+      data.allTimeHigh;
+
+    const drawdown =
+      data.drawdownPercent;
+
+    const signal =
+      data.exitSignal;
+
+    document.getElementById(
+      "smhValue"
+    ).innerHTML =
       `Latest VVSM price: €${latestPrice.toFixed(2)}<br>
-<b>Your position value: €${valueEur.toFixed(2)}</b><br>
-<span class="small">Updated: ${data.updated}</span>`;
+       <b>Your position value: €${valueEur.toFixed(2)}</b><br>
+       <span class="small">
+       Updated: ${data.updated}
+       </span>`;
 
-    const ctx = document.getElementById("smhChart").getContext("2d");
+    document.getElementById(
+      "vvsmRisk"
+    ).innerHTML =
+      `<b>ATH:</b> €${ath.toFixed(2)}<br>
+       <b>Current:</b> €${latestPrice.toFixed(2)}<br>
+       <b>Drawdown:</b> ${drawdown.toFixed(1)} %<br>
+       <b>Signal:</b> ${signal}<br>
+       <b>SMA20:</b> ${data.sma20}<br>
+       <b>SMA50:</b> ${data.sma50}`;
+
+    let colour = "lime";
+
+    if (signal === "REDUCE")
+      colour = "orange";
+
+    if (signal === "EXIT")
+      colour = "red";
+
+    document.getElementById(
+      "masterExit"
+    ).innerHTML =
+      `<div style="
+           font-size:42px;
+           font-weight:bold;
+           color:${colour};
+         ">
+         ${signal}
+       </div>
+
+       <div style="font-size:18px">
+         Drawdown:
+         ${drawdown.toFixed(1)} %
+       </div>`;
+
+    const ctx =
+      document
+        .getElementById("smhChart")
+        .getContext("2d");
+
     new Chart(ctx, {
       type: "line",
       data: {
-        labels: timestamps.map(t => t.toISOString().split("T")[0]),
+        labels:
+          timestamps.map(
+            t =>
+              t.toISOString()
+               .split("T")[0]
+          ),
+
         datasets: [{
-          label: "VVSM (VanEck Semiconductor UCITS ETF) price in EUR",
+          label:
+            "VVSM price EUR",
+
           data: closes,
+
           borderColor: "lime",
+
           borderWidth: 2,
+
           tension: 0.2,
+
           pointRadius: 0
         }]
       },
       options: {
         plugins: {
-          legend: { labels: { color: "#eee" } }
+          legend: {
+            labels: {
+              color: "#eee"
+            }
+          }
         },
         scales: {
           x: {
-            ticks: { color: "#aaa" },
-            grid: { color: "#333" }
+            ticks: {
+              color: "#aaa"
+            },
+            grid: {
+              color: "#333"
+            }
           },
           y: {
-            ticks: { color: "#aaa" },
-            grid: { color: "#333" }
+            ticks: {
+              color: "#aaa"
+            },
+            grid: {
+              color: "#333"
+            }
           }
         }
       }
     });
-  } catch (e) {
-    document.getElementById("smhValue").innerHTML =
-      "VVSM data not available. Run update_smh.js to generate smh.json.";
+
+  }
+  catch (e) {
+
+    document.getElementById(
+      "smhValue"
+    ).innerHTML =
+      "VVSM data not available.";
+
   }
 }
 
