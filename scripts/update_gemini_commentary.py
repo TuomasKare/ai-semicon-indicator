@@ -2,32 +2,45 @@ import os
 import json
 import datetime
 import urllib.request
-import urllib.error
+import traceback
 
 API_KEY = os.environ["GEMINI_API_KEY"]
 
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-1.5-flash"
 
 prompt = """
-You are writing a short market commentary for a semiconductor and AI infrastructure dashboard.
+You are writing a market commentary for an AI Semiconductor investment dashboard.
 
 Focus on:
-- semiconductor market sentiment
-- AI data centre spending
-- Nvidia, AMD, TSMC, Broadcom, ASML, Micron
-- Microsoft, Meta, Amazon and hyperscaler CAPEX
-- whether the current move looks bullish, neutral, or bearish
+- Nvidia
+- AMD
+- TSMC
+- Broadcom
+- ASML
+- Micron
+- Microsoft AI spending
+- Meta AI spending
+- Amazon AI spending
 
 Write in Finnish.
-Be concise.
 
-Give:
-1. Short summary
-2. Bullish factors
-3. Bearish risks
-4. Final view
+Format:
 
-Do not give personal financial advice.
+YHTEENVETO
+(2-3 sentences)
+
+NOUSUA TUKEVAT TEKIJÄT
+- bullet
+- bullet
+
+RISKIT
+- bullet
+- bullet
+
+JOHTOPÄÄTÖS
+(one paragraph)
+
+No investment advice.
 """
 
 url = (
@@ -44,11 +57,7 @@ payload = {
                 }
             ]
         }
-    ],
-    "generationConfig": {
-        "temperature": 0.4,
-        "maxOutputTokens": 900
-    }
+    ]
 }
 
 data = json.dumps(payload).encode("utf-8")
@@ -70,12 +79,18 @@ try:
     text = result["candidates"][0]["content"]["parts"][0]["text"]
 
 except Exception as e:
-    text = f"Gemini commentary update failed: {str(e)}"
+    text = (
+        f"Gemini commentary update failed\n\n"
+        f"{str(e)}\n\n"
+        f"{traceback.format_exc()}"
+    )
 
 output = {
-    "updated_at_utc": datetime.datetime.utcnow().replace(
-        microsecond=0
-    ).isoformat() + "Z",
+    "updated_at_utc": (
+        datetime.datetime.utcnow()
+        .replace(microsecond=0)
+        .isoformat() + "Z"
+    ),
     "source": "Gemini API via GitHub Actions",
     "model": MODEL,
     "commentary": text
@@ -85,3 +100,4 @@ with open("commentary.json", "w", encoding="utf-8") as f:
     json.dump(output, f, ensure_ascii=False, indent=2)
 
 print("commentary.json updated")
+``
