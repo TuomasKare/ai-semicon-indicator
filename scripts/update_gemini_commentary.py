@@ -1,57 +1,63 @@
 import os
 import json
-import urllib.request
-import urllib.error
 import traceback
 from datetime import datetime
+from google import genai
 
-API_KEY = os.environ["GEMINI_API_KEY"]
-
-url = (
-    "https://generativelanguage.googleapis.com/"
-    "v1beta/models/gemini-1.5-flash:generateContent"
-    f"?key={API_KEY}"
-)
-
-payload = {
-    "contents": [
-        {
-            "parts": [
-                {
-                    "text": "Write one sentence about the semiconductor market."
-                }
-            ]
-        }
-    ]
-}
+commentary = ""
 
 try:
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST"
+    api_key = os.environ["GEMINI_API_KEY"]
+
+    client = genai.Client(api_key=api_key)
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents="""
+Kirjoita lyhyt markkinakommentti suomeksi.
+
+Käsittele:
+- Nvidia
+- AMD
+- TSMC
+- Broadcom
+- ASML
+- Micron
+- Microsoft AI CAPEX
+- Meta AI CAPEX
+- Amazon AI CAPEX
+
+Muoto:
+
+YHTEENVETO
+
+NOUSUA TUKEVAT TEKIJÄT
+
+RISKIT
+
+JOHTOPÄÄTÖS
+
+Älä anna sijoitusneuvoja.
+"""
     )
 
-    with urllib.request.urlopen(req, timeout=60) as response:
-        raw = response.read().decode("utf-8")
-        parsed = json.loads(raw)
-
-        commentary = parsed["candidates"][0]["content"]["parts"][0]["text"]
+    commentary = response.text
 
 except Exception as e:
     commentary = (
-        f"ERROR\n\n"
-        f"{str(e)}\n\n"
-        f"{traceback.format_exc()}"
+        "ERROR\n\n"
+        + str(e)
+        + "\n\n"
+        + traceback.format_exc()
     )
 
 output = {
     "updated_at_utc": datetime.utcnow().isoformat() + "Z",
+    "source": "Gemini",
     "commentary": commentary
 }
 
 with open("commentary.json", "w", encoding="utf-8") as f:
-    json.dump(output, f, indent=2)
+    json.dump(output, f, ensure_ascii=False, indent=2)
 
-print("done")
+print("commentary.json updated")
