@@ -482,11 +482,84 @@ async function loadSMHChart() {
 
   }
 }
+async function loadExitScore() {
 
+  const smh =
+    await (
+      await fetch(
+        "smh.json?t=" +
+        Date.now()
+      )
+    ).json();
+
+  const drawdown =
+    Math.abs(
+      smh.drawdownPercent
+    );
+
+  let drawdownRisk = 0;
+
+  if (drawdown >= 20)
+    drawdownRisk = 100;
+  else if (drawdown >= 15)
+    drawdownRisk = 75;
+  else if (drawdown >= 10)
+    drawdownRisk = 50;
+  else if (drawdown >= 5)
+    drawdownRisk = 25;
+
+  let action = "BUY";
+  let colour = "lime";
+
+  if (drawdownRisk >= 75) {
+    action = "EXIT";
+    colour = "red";
+  }
+  else if (drawdownRisk >= 50) {
+    action = "REDUCE";
+    colour = "orange";
+  }
+  else if (drawdownRisk >= 25) {
+    action = "HOLD";
+    colour = "yellow";
+  }
+
+  document.getElementById(
+    "exitScore"
+  ).innerHTML =
+    `<span style="color:${colour}">
+      ${drawdownRisk}/100
+    </span>`;
+
+  document.getElementById(
+    "exitDecision"
+  ).innerHTML =
+    `<span style="color:${colour}">
+      ${action}
+    </span>`;
+
+  document.getElementById(
+    "exitExplanation"
+  ).innerHTML =
+    `
+    Drawdown Risk:
+    ${drawdownRisk}<br>
+
+    ATH:
+    €${smh.allTimeHigh}<br>
+
+    Current:
+    €${smh.latestPriceEUR}<br>
+
+    Drawdown:
+    ${smh.drawdownPercent.toFixed(2)}%
+    `;
+}
 loadCore();
 loadAIMacro();
 loadSMHChart();
 loadVVSMHoldings();
+loadExitScore();
 </script>
 
 </body>
