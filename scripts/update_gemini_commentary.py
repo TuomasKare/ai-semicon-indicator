@@ -12,7 +12,7 @@ try:
     client = genai.Client(api_key=api_key)
 
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-3.5-flash",
         contents="""
 Kirjoita lyhyt markkinakommentti suomeksi.
 
@@ -54,7 +54,7 @@ except Exception as e:
 output = {
     "updated_at_utc": datetime.utcnow().isoformat() + "Z",
     "source": "Gemini",
-    "model": "gemini-2.0-flash",
+    "model": "gemini-3.5-flash",
     "commentary": commentary
 }
 
