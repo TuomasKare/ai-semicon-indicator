@@ -484,6 +484,14 @@ async function loadSMHChart() {
 }
 async function loadExitScore() {
 
+  const core =
+    await (
+      await fetch(
+        "data.json?t=" +
+        Date.now()
+      )
+    ).json();
+
   const smh =
     await (
       await fetch(
@@ -491,6 +499,25 @@ async function loadExitScore() {
         Date.now()
       )
     ).json();
+
+  const defs =
+    await (
+      await fetch(
+        "ai_macro_indicators.json"
+      )
+    ).json();
+
+  const vals =
+    await (
+      await fetch(
+        "ai_macro_values.json?t=" +
+        Date.now()
+      )
+    ).json();
+
+  /* =====================
+     DRAWDOWN RISK
+  ===================== */
 
   const drawdown =
     Math.abs(
@@ -508,18 +535,127 @@ async function loadExitScore() {
   else if (drawdown >= 5)
     drawdownRisk = 25;
 
+  /* =====================
+     CORE RISK
+  ===================== */
+
+  const soxxSignal =
+    (+core.soxxChange > 0)
+      ? 1
+      : -1;
+
+  const nvdaSignal =
+    (+core.nvdaChange > 5)
+      ? -1
+      : 1;
+
+  const vixSignal =
+    (+core.vix > 25)
+      ? -1
+      : 0;
+
+  const oilSignal =
+    (+core.oil > 95)
+      ? -0.5
+      : 0;
+
+  const coreScore =
+      0.4 * soxxSignal +
+      0.3 * nvdaSignal +
+      0.2 * vixSignal +
+      0.1 * oilSignal;
+
+  const coreRisk =
+      ((1 - coreScore) / 2) * 100;
+
+  /* =====================
+     AI MACRO RISK
+  ===================== */
+
+  const groups = {
+    hardware: [],
+    hyperscalers: [],
+    macro: []
+  };
+
+  defs.forEach(d => {
+
+    const v =
+      vals.values[d.ticker];
+
+    if (!v)
+      return;
+
+    const signal =
+      v.change > 0
+      ? 1
+      : v.change < 0
+      ? -1
+      : 0;
+
+    let bucket;
+
+    if (
+      d.category.includes("Semiconductor") ||
+      d.category.includes("GPU") ||
+      d.category.includes("CPU")
+    ) {
+      bucket = "hardware";
+    }
+    else if (
+      d.category.includes("Cloud") ||
+      d.category.includes("Software")
+    ) {
+      bucket = "hyperscalers";
+    }
+    else {
+      bucket = "macro";
+    }
+
+    groups[bucket].push(signal);
+  });
+
+  const avg =
+    arr =>
+      arr.length
+        ? arr.reduce(
+            (a, b) => a + b,
+            0
+          ) / arr.length
+        : 0;
+
+  const macroScore =
+      0.45 *
+        avg(groups.hardware) +
+      0.30 *
+        avg(groups.hyperscalers) +
+      0.25 *
+        avg(groups.macro);
+
+  const macroRisk =
+      ((1 - macroScore) / 2) * 100;
+
+  /* =====================
+     FINAL SCORE
+  ===================== */
+
+  const finalScore =
+      drawdownRisk * 0.50 +
+      macroRisk * 0.30 +
+      coreRisk * 0.20;
+
   let action = "BUY";
   let colour = "lime";
 
-  if (drawdownRisk >= 75) {
+  if (finalScore >= 70) {
     action = "EXIT";
     colour = "red";
   }
-  else if (drawdownRisk >= 50) {
+  else if (finalScore >= 50) {
     action = "REDUCE";
     colour = "orange";
   }
-  else if (drawdownRisk >= 25) {
+  else if (finalScore >= 25) {
     action = "HOLD";
     colour = "yellow";
   }
@@ -528,7 +664,7 @@ async function loadExitScore() {
     "exitScore"
   ).innerHTML =
     `<span style="color:${colour}">
-      ${drawdownRisk}/100
+      ${finalScore.toFixed(0)}/100
     </span>`;
 
   document.getElementById(
@@ -543,7 +679,13 @@ async function loadExitScore() {
   ).innerHTML =
     `
     Drawdown Risk:
-    ${drawdownRisk}<br>
+    ${drawdownRisk.toFixed(0)}<br>
+
+    AI Macro Risk:
+    ${macroRisk.toFixed(0)}<br>
+
+    CORE Risk:
+    ${coreRisk.toFixed(0)}<br><br>
 
     ATH:
     €${smh.allTimeHigh}<br>
@@ -555,6 +697,7 @@ async function loadExitScore() {
     ${smh.drawdownPercent.toFixed(2)}%
     `;
 }
+`
 loadCore();
 loadAIMacro();
 loadSMHChart();
