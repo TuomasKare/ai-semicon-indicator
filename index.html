@@ -305,9 +305,23 @@ OIL: ${(0.1*oilSignal).toFixed(2)}<br><br>
 }
 
 /* ================= AI MACRO SCORE ================= */
-async function loadAIMacro(){
-  const defs = await (await fetch("ai_macro_indicators.json")).json();
-  const vals = await (await fetch("ai_macro_values.json?t=" + Date.now())).json();
+/* ================= AI MACRO SCORE ================= */
+async function loadAIMacro() {
+
+  const defs =
+    await (
+      await fetch(
+        "ai_macro_indicators.json"
+      )
+    ).json();
+
+  const vals =
+    await (
+      await fetch(
+        "ai_macro_values.json?t=" +
+        Date.now()
+      )
+    ).json();
 
   const groups = {
     hardware: [],
@@ -322,59 +336,149 @@ async function loadAIMacro(){
   };
 
   defs.forEach(d => {
-    const v = vals.values[d.ticker];
-    if(!v) return;
 
-    const s = v.change > 0 ? 1 : v.change < 0 ? -1 : 0;
+    const v = vals.values[d.ticker];
+
+    if (!v)
+      return;
+
+    /*
+      UUSI LOGIIKKA
+
+      +5% tai enemmän = +1
+      +2.5% = +0.5
+      0% = 0
+      -2.5% = -0.5
+      -5% tai vähemmän = -1
+    */
+
+    const signal =
+      Math.max(
+        -1,
+        Math.min(
+          1,
+          v.change / 5
+        )
+      );
 
     let bucket;
-    if(d.category.includes("Semiconductor") || d.category.includes("GPU") || d.category.includes("CPU"))
-      bucket = "hardware";
-    else if(d.category.includes("Cloud") || d.category.includes("Software"))
-      bucket = "hyperscalers";
-    else
-      bucket = "macro";
 
-    groups[bucket].push(s);
+    if (
+      d.category.includes("Semiconductor") ||
+      d.category.includes("GPU") ||
+      d.category.includes("CPU")
+    ) {
+      bucket = "hardware";
+    }
+    else if (
+      d.category.includes("Cloud") ||
+      d.category.includes("Software")
+    ) {
+      bucket = "hyperscalers";
+    }
+    else {
+      bucket = "macro";
+    }
+
+    groups[bucket].push(signal);
     tickers[bucket].push(d.ticker);
 
-    const div = document.createElement("div");
+    const div =
+      document.createElement("div");
+
     div.className = "card";
+
     div.innerHTML = `
 <b>${d.ticker}</b> — ${d.name}<br>
 ${v.price} (${v.change.toFixed(2)}%)<br>
 <span class="small">${d.logic}</span>
 `;
-    document.getElementById("grp_" + bucket).appendChild(div);
+
+    document
+      .getElementById(
+        "grp_" + bucket
+      )
+      .appendChild(div);
+
   });
 
-  const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
+  const avg =
+    arr =>
+      arr.length
+        ? arr.reduce(
+            (a, b) => a + b,
+            0
+          ) / arr.length
+        : 0;
 
-  const hw = avg(groups.hardware);
-  const hs = avg(groups.hyperscalers);
-  const ma = avg(groups.macro);
+  const hw =
+    avg(groups.hardware);
 
-  const macroScore = 0.45*hw + 0.30*hs + 0.25*ma;
+  const hs =
+    avg(groups.hyperscalers);
 
-  document.getElementById("macroScore").innerHTML =
-    macroScore > 0.5 ? `<span class="hold">Strong AI (${macroScore.toFixed(2)})</span>` :
-    macroScore > 0 ? `<span class="warning">Late-cycle AI (${macroScore.toFixed(2)})</span>` :
-    `<span class="exit">Weak AI (${macroScore.toFixed(2)})</span>`;
+  const ma =
+    avg(groups.macro);
 
-  document.getElementById("macroExplain").innerHTML = `
-<b>Hardware (+${(0.45*hw).toFixed(2)}):</b><br>
-Contributors: [${tickers.hardware.join(", ")}]<br>
-${tickers.hardware.length} indicators → avg ${hw.toFixed(2)} × 45%<br><br>
+  const macroScore =
+      0.45 * hw +
+      0.30 * hs +
+      0.25 * ma;
 
-<b>Hyperscalers (+${(0.30*hs).toFixed(2)}):</b><br>
-Contributors: [${tickers.hyperscalers.join(", ")}]<br>
-${tickers.hyperscalers.length} indicators → avg ${hs.toFixed(2)} × 30%<br><br>
+  document.getElementById(
+    "macroScore"
+  ).innerHTML =
 
-<b>Macro / Risk (+${(0.25*ma).toFixed(2)}):</b><br>
-Contributors: [${tickers.macro.join(", ")}]<br>
-${tickers.macro.length} indicators → avg ${ma.toFixed(2)} × 25%<br><br>
+    macroScore > 0.5
+    ? `<span class="hold">
+         Strong AI
+         (${macroScore.toFixed(2)})
+       </span>`
+    :
 
-<b>Total AI Macro Score: ${macroScore.toFixed(2)}</b>`;
+    macroScore > 0
+    ? `<span class="warning">
+         Late-cycle AI
+         (${macroScore.toFixed(2)})
+       </span>`
+    :
+
+    `<span class="exit">
+       Weak AI
+       (${macroScore.toFixed(2)})
+     </span>`;
+
+  document.getElementById(
+    "macroExplain"
+  ).innerHTML =
+
+    `<b>Hardware (+${(0.45*hw).toFixed(2)}):</b><br>
+     Contributors:
+     [${tickers.hardware.join(", ")}]<br>
+     Avg signal:
+     ${hw.toFixed(2)} × 45%<br><br>
+
+     <b>Hyperscalers (+${(0.30*hs).toFixed(2)}):</b><br>
+     Contributors:
+     [${tickers.hyperscalers.join(", ")}]<br>
+     Avg signal:
+     ${hs.toFixed(2)} × 30%<br><br>
+
+     <b>Macro / Risk (+${(0.25*ma).toFixed(2)}):</b><br>
+     Contributors:
+     [${tickers.macro.join(", ")}]<br>
+     Avg signal:
+     ${ma.toFixed(2)} × 25%<br><br>
+
+     <b>Total AI Macro Score:
+     ${macroScore.toFixed(2)}</b><br><br>
+
+     Signal scaling:<br>
+     +5% = +1<br>
+     +2.5% = +0.5<br>
+     0% = 0<br>
+     -2.5% = -0.5<br>
+     -5% = -1`;
 }
 
 /* ================= VVSM PRICE & POSITION CHART ================= */
@@ -560,21 +664,18 @@ async function loadExitScore() {
      DRAWDOWN RISK
   ===================== */
 
-  const drawdown =
-    Math.abs(
-      smh.drawdownPercent
+const drawdown =
+  Math.abs(
+    smh.drawdownPercent
+  );
+
+let drawdownRisk = 0;
+
+drawdownRisk =
+    Math.min(
+      drawdown * 4,
+      100
     );
-
-  let drawdownRisk = 0;
-
-  if (drawdown >= 20)
-    drawdownRisk = 100;
-  else if (drawdown >= 15)
-    drawdownRisk = 75;
-  else if (drawdown >= 10)
-    drawdownRisk = 50;
-  else if (drawdown >= 5)
-    drawdownRisk = 25;
 
   /* =====================
      CORE RISK
@@ -585,11 +686,7 @@ async function loadExitScore() {
       ? 1
       : -1;
 
-  const nvdaSignal =
-    (+core.nvdaChange > 5)
-      ? -1
-      : 1;
-
+const nvdaSignal =2  nvdaCh > 03  ? 14  : -1;
   const vixSignal =
     (+core.vix > 25)
       ? -1
@@ -680,10 +777,10 @@ async function loadExitScore() {
      FINAL SCORE
   ===================== */
 
-  const finalScore =
-      drawdownRisk * 0.50 +
-      macroRisk * 0.30 +
-      coreRisk * 0.20;
+const finalScore =
+      drawdownRisk * 0.40 +
+      macroRisk * 0.35 +
+      coreRisk * 0.25;
 
   let action = "BUY";
   let colour = "lime";
