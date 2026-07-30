@@ -45,6 +45,10 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
   </div>
 </div>
 
+HTML1<div id="gemini-commentary">Loading Gemini commentary...</div>2 3<script>4async function loadGeminiCommentary() {5  try {6    const response = await fetch("commentary.json?ts=" + Date.now());7    const data = await response.json();8 9    document.getElementById("gemini-commentary").innerHTML = `10      <p><strong>Updated:</strong> ${data.updated_at_utc}</p>11      <pre style="white-space: pre-wrap; font-family: inherit;">${data.commentary}</pre>12    `;13  } catch (error) {14    document.getElementById("gemini-commentary").textContent =15      "Could not load Gemini commentary.";16  }17}18 19loadGeminiCommentary();20</script>
+
+
+  
 <!-- ================= CORE EXIT INDICATOR ================= -->
 <div class="card">
 <h2>CORE Exit Indicator</h2>
