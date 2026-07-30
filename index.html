@@ -283,10 +283,13 @@ async function loadCore(){
   document.getElementById("time").innerText = d.updated;
 
   const soxxSignal = soxxCh > 0 ? 1 : -1;
-  const nvdaSignal = nvdaCh > 5 ? -1 : 1;
+
   const vixSignal = vix > 25 ? -1 : 0;
   const oilSignal = oil > 95 ? -0.5 : 0;
-
+const nvdaSignal =
+  (+core.nvdaChange > 0)
+    ? 1
+    : -1;
   const score =
     0.4*soxxSignal + 0.3*nvdaSignal + 0.2*vixSignal + 0.1*oilSignal;
 
@@ -686,7 +689,11 @@ drawdownRisk =
       ? 1
       : -1;
 
-const nvdaSignal =2  nvdaCh > 03  ? 14  : -1;
+const nvdaSignal =
+  (+core.nvdaChange > 0)
+    ? 1
+    : -1;
+  
   const vixSignal =
     (+core.vix > 25)
       ? -1
@@ -724,12 +731,14 @@ const nvdaSignal =2  nvdaCh > 03  ? 14  : -1;
     if (!v)
       return;
 
-    const signal =
-      v.change > 0
-      ? 1
-      : v.change < 0
-      ? -1
-      : 0;
+const signal =
+  Math.max(
+    -1,
+    Math.min(
+      1,
+      v.change / 5
+    )
+  );
 
     let bucket;
 
