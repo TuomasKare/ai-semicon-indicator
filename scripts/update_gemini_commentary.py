@@ -7,41 +7,21 @@ from google import genai
 commentary = ""
 
 try:
-    api_key = os.environ["GEMINI_API_KEY"]
-
-    client = genai.Client(api_key=api_key)
-
-    response = client.models.generate_content(
-        model="gemini-3.1-flash",
-        contents="""
-Kirjoita lyhyt markkinakommentti suomeksi.
-
-Käsittele:
-- Nvidia
-- AMD
-- TSMC
-- Broadcom
-- ASML
-- Micron
-- Microsoft AI CAPEX
-- Meta AI CAPEX
-- Amazon AI CAPEX
-
-Muoto:
-
-YHTEENVETO
-
-NOUSUA TUKEVAT TEKIJÄT
-
-RISKIT
-
-JOHTOPÄÄTÖS
-
-Älä anna sijoitusneuvoja.
-"""
+    client = genai.Client(
+        api_key=os.environ["GEMINI_API_KEY"]
     )
 
-    commentary = response.text
+    models = client.models.list()
+
+    model_names = []
+
+    for model in models:
+        try:
+            model_names.append(model.name)
+        except Exception:
+            pass
+
+    commentary = "\n".join(sorted(model_names))
 
 except Exception as e:
     commentary = (
@@ -54,7 +34,6 @@ except Exception as e:
 output = {
     "updated_at_utc": datetime.utcnow().isoformat() + "Z",
     "source": "Gemini",
-    "model": "gemini-3.5-flash",
     "commentary": commentary
 }
 
@@ -62,3 +41,4 @@ with open("commentary.json", "w", encoding="utf-8") as f:
     json.dump(output, f, ensure_ascii=False, indent=2)
 
 print("commentary.json updated")
+`
