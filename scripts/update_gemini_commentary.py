@@ -4,6 +4,41 @@ import traceback
 from datetime import datetime
 from google import genai
 
+MODELS = [
+    "gemini-3.6-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-2.5-flash-lite",
+    "gemini-2.5-flash"
+]
+
+PROMPT = """
+Kirjoita lyhyt markkinakommentti suomeksi.
+
+Käsittele:
+- Nvidia
+- AMD
+- TSMC
+- Broadcom
+- ASML
+- Micron
+- Microsoft AI CAPEX
+- Meta AI CAPEX
+- Amazon AI CAPEX
+
+Muoto:
+
+YHTEENVETO
+
+NOUSUA TUKEVAT TEKIJÄT
+
+RISKIT
+
+JOHTOPÄÄTÖS
+
+Älä anna sijoitusneuvoja.
+"""
+
+used_model = None
 commentary = ""
 
 try:
@@ -11,17 +46,24 @@ try:
         api_key=os.environ["GEMINI_API_KEY"]
     )
 
-    models = client.models.list()
+    last_error = ""
 
-    model_names = []
-
-    for model in models:
+    for model in MODELS:
         try:
-            model_names.append(model.name)
-        except Exception:
-            pass
+            response = client.models.generate_content(
+                model=model,
+                contents=PROMPT
+            )
 
-    commentary = "\n".join(sorted(model_names))
+            commentary = response.text
+            used_model = model
+            break
+
+        except Exception as model_error:
+            last_error = str(model_error)
+
+    if used_model is None:
+        raise Exception(last_error)
 
 except Exception as e:
     commentary = (
@@ -30,10 +72,12 @@ except Exception as e:
         + "\n\n"
         + traceback.format_exc()
     )
+    used_model = "NONE"
 
 output = {
     "updated_at_utc": datetime.utcnow().isoformat() + "Z",
     "source": "Gemini",
+    "model": used_model,
     "commentary": commentary
 }
 
