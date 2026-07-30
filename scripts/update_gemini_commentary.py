@@ -12,7 +12,7 @@ try:
     client = genai.Client(api_key=api_key)
 
     response = client.models.generate_content(
-        model="gemini-3.0-flash",
+        model="gemini-3.1-flash",
         contents="""
 Kirjoita lyhyt markkinakommentti suomeksi.
 
