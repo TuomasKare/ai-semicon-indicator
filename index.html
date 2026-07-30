@@ -59,13 +59,15 @@ body { background:#0b0b0b; color:#eee; font-family:Arial; padding:20px;}
 
   <div class="small">
 
-    <b>Drawdown Risk (50%)</b><br>
-    Based on distance from all-time high.<br>
-    0-5% = 0 risk<br>
-    5-10% = 25 risk<br>
-    10-15% = 50 risk<br>
-    15-20% = 75 risk<br>
-    >20% = 100 risk<br><br>
+<b>Drawdown Risk (40%)</b><br>
+Risk = min(Drawdown × 4, 100)<br><br>
+
+Examples:<br>
+5% drawdown = 20 risk<br>
+10% drawdown = 40 risk<br>
+15% drawdown = 60 risk<br>
+20% drawdown = 80 risk<br>
+25% drawdown = 100 risk<br>
 
     <b>AI Macro Risk (30%)</b><br>
     Based on semiconductor, hyperscaler and macro indicators.<br>
