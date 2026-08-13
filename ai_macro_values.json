@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-13T20:03:52.013Z",
+  "updated": "2026-08-13T20:22:15.642Z",
   "values": {
     "NVDA": {
       "price": 225.3,
@@ -26,8 +26,8 @@
       "change": 0.48
     },
     "THNQ": {
-      "price": 94.18,
-      "change": 4.01
+      "price": 94.38,
+      "change": 4.24
     },
     "SMH": {
       "price": 589.12,
@@ -38,12 +38,12 @@
       "change": 1.38
     },
     "XSD": {
-      "price": 534.76,
-      "change": -1.82
+      "price": 535.08,
+      "change": -1.76
     },
     "TSM": {
-      "price": 430.55,
-      "change": 2.5
+      "price": 430.49,
+      "change": 2.49
     },
     "ASML": {
       "price": 1847.9,
@@ -82,44 +82,44 @@
       "change": -2.58
     },
     "^VIX": {
-      "price": 14.64,
-      "change": -1.74
+      "price": 14.57,
+      "change": -2.21
     },
     "CL=F": {
-      "price": 81.18,
-      "change": -1.16
+      "price": 81.22,
+      "change": -1.11
     },
     "BOTZ": {
       "price": 37.82,
       "change": 0.56
     },
     "ITA": {
-      "price": 249.68,
-      "change": -0.43
+      "price": 249.69,
+      "change": -0.42
     },
     "BDRY": {
-      "price": 14.16,
-      "change": 2.91
+      "price": 13.89,
+      "change": 0.94
     },
     "FXI": {
-      "price": 34.87,
-      "change": -3.59
+      "price": 34.86,
+      "change": -3.62
     },
     "GLD": {
       "price": 398.95,
       "change": 0.12
     },
     "GDX": {
-      "price": 88.25,
-      "change": -1.82
+      "price": 88.27,
+      "change": -1.8
     },
     "BTC-USD": {
-      "price": 63303.53,
-      "change": -2.38
+      "price": 63386.55,
+      "change": -2.25
     },
     "DX-Y.NYB": {
-      "price": 99.96,
-      "change": 0.16
+      "price": 99.98,
+      "change": 0.17
     },
     "^TNX": {
       "price": 4.64,
