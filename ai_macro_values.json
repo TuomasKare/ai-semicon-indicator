@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-17T21:39:29.765Z",
+  "updated": "2026-08-17T21:51:11.321Z",
   "values": {
     "NVDA": {
       "price": 225.01,
@@ -27,7 +27,7 @@
     },
     "THNQ": {
       "price": 93.55,
-      "change": 0.9
+      "change": 2.49
     },
     "SMH": {
       "price": 594.07,
@@ -114,8 +114,8 @@
       "change": 1.96
     },
     "BTC-USD": {
-      "price": 64288.43,
-      "change": 1.4
+      "price": 64318.42,
+      "change": 1.45
     },
     "DX-Y.NYB": {
       "price": 99.58,
