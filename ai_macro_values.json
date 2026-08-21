@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-21T05:03:42.945Z",
+  "updated": "2026-08-21T05:04:32.883Z",
   "values": {
     "NVDA": {
       "price": 216.85,
@@ -42,12 +42,12 @@
       "change": -8.74
     },
     "TSM": {
-      "price": 416,
-      "change": -2.43
+      "price": 412.09,
+      "change": -3.34
     },
     "ASML": {
-      "price": 1750.31,
-      "change": -5.08
+      "price": 1751.73,
+      "change": -5.01
     },
     "AMAT": {
       "price": 496.21,
@@ -86,8 +86,8 @@
       "change": 12.35
     },
     "CL=F": {
-      "price": 86.38,
-      "change": 2.22
+      "price": 86.35,
+      "change": 2.19
     },
     "BOTZ": {
       "price": 35.81,
@@ -114,8 +114,8 @@
       "change": 10.98
     },
     "BTC-USD": {
-      "price": 75009.54,
-      "change": 16.28
+      "price": 74888.23,
+      "change": 16.09
     },
     "DX-Y.NYB": {
       "price": 98.77,
