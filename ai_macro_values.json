@@ -1,130 +1,37 @@
 {
-  "updated": "2026-09-03T20:29:14.834Z",
-  "values": {
-    "NVDA": {
-      "price": 228.45,
-      "change": 5.01
-    },
-    "MSFT": {
-      "price": 510.12,
-      "change": -0.66
-    },
-    "AVGO": {
-      "price": 357.16,
-      "change": -3.15
-    },
-    "GOOGL": {
-      "price": 342.48,
-      "change": -1.19
-    },
-    "AMZN": {
-      "price": 258.9,
-      "change": -2.83
-    },
-    "META": {
-      "price": 610.68,
-      "change": 5.65
-    },
-    "THNQ": {
-      "price": 89.8,
-      "change": -1.26
-    },
-    "SMH": {
-      "price": 552.6,
-      "change": -0.09
-    },
-    "SOXX": {
-      "price": 502.2,
-      "change": -1.26
-    },
-    "XSD": {
-      "price": 478.52,
-      "change": -0.69
-    },
-    "TSM": {
-      "price": 417.01,
-      "change": -0.12
-    },
-    "ASML": {
-      "price": 1646.19,
-      "change": -2.95
-    },
-    "AMAT": {
-      "price": 435.91,
-      "change": -5.58
-    },
-    "LRCX": {
-      "price": 292.66,
-      "change": -3.06
-    },
-    "INTC": {
-      "price": 91.67,
-      "change": 2.46
-    },
-    "AMD": {
-      "price": 456.16,
-      "change": -2.02
-    },
-    "ARM": {
-      "price": 242.59,
-      "change": 1.48
-    },
-    "QCOM": {
-      "price": 168.57,
-      "change": 2.67
-    },
-    "MU": {
-      "price": 958.16,
-      "change": 2.71
-    },
-    "AAPL": {
-      "price": 328.21,
-      "change": 2.66
-    },
-    "^VIX": {
-      "price": 14.32,
-      "change": -0.76
-    },
-    "CL=F": {
-      "price": 91.73,
-      "change": 6.96
-    },
-    "BOTZ": {
-      "price": 35.81,
-      "change": 0.17
-    },
-    "ITA": {
-      "price": 225.98,
-      "change": -2.94
-    },
-    "BDRY": {
-      "price": 16.14,
-      "change": 3.99
-    },
-    "FXI": {
-      "price": 35.34,
-      "change": -0.48
-    },
-    "GLD": {
-      "price": 410.22,
-      "change": 0.33
-    },
-    "GDX": {
-      "price": 101.49,
-      "change": 1.85
-    },
-    "BTC-USD": {
-      "price": 81605.98,
-      "change": 5.07
-    },
-    "DX-Y.NYB": {
-      "price": 98.98,
-      "change": -0.45
-    },
-    "^TNX": {
-      "price": 4.76,
-      "change": 0.89
-    }
-  },
-  "failed": []
+  "updated": "2026-09-03T21:21:22.981Z",
+  "values": {},
+  "failed": [
+    "NVDA",
+    "MSFT",
+    "AVGO",
+    "GOOGL",
+    "AMZN",
+    "META",
+    "THNQ",
+    "SMH",
+    "SOXX",
+    "XSD",
+    "TSM",
+    "ASML",
+    "AMAT",
+    "LRCX",
+    "INTC",
+    "AMD",
+    "ARM",
+    "QCOM",
+    "MU",
+    "AAPL",
+    "^VIX",
+    "CL=F",
+    "BOTZ",
+    "ITA",
+    "BDRY",
+    "FXI",
+    "GLD",
+    "GDX",
+    "BTC-USD",
+    "DX-Y.NYB",
+    "^TNX"
+  ]
 }
