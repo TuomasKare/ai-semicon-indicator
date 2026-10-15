@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15T00:53:55.652Z",
+  "updated": "2026-10-15T04:36:53.554Z",
   "values": {
     "NVDA": {
       "price": 221.3,
@@ -22,12 +22,12 @@
       "change": 0.01
     },
     "META": {
-      "price": 762.5,
-      "change": 5.77
+      "price": 737.54,
+      "change": 2.31
     },
     "THNQ": {
-      "price": 96.19,
-      "change": -1.05
+      "price": 92.19,
+      "change": -5.17
     },
     "SMH": {
       "price": 564.74,
@@ -66,8 +66,8 @@
       "change": -8.03
     },
     "ARM": {
-      "price": 255.39,
-      "change": -7.23
+      "price": 238.01,
+      "change": -13.54
     },
     "QCOM": {
       "price": 172.62,
@@ -86,20 +86,20 @@
       "change": 9.47
     },
     "CL=F": {
-      "price": 94.46,
-      "change": 2.84
+      "price": 94.06,
+      "change": 0.34
     },
     "BOTZ": {
-      "price": 34.96,
-      "change": 0.37
+      "price": 34.11,
+      "change": -2.07
     },
     "ITA": {
       "price": 204.24,
       "change": -0.31
     },
     "BDRY": {
-      "price": 13.12,
-      "change": -9.39
+      "price": 12.58,
+      "change": -13.12
     },
     "FXI": {
       "price": 33.86,
@@ -114,12 +114,12 @@
       "change": -3.83
     },
     "BTC-USD": {
-      "price": 81549.06,
-      "change": -2.55
+      "price": 81515.51,
+      "change": -2.59
     },
     "DX-Y.NYB": {
-      "price": 102.18,
-      "change": -0.03
+      "price": 102.04,
+      "change": -0.53
     },
     "^TNX": {
       "price": 5.19,
