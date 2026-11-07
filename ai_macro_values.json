@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-06T23:56:30.999Z",
+  "updated": "2026-11-07T02:11:30.293Z",
   "values": {
     "NVDA": {
       "price": 186.64,
@@ -22,12 +22,12 @@
       "change": 5.57
     },
     "META": {
-      "price": 610.15,
-      "change": 0.56
+      "price": 605.08,
+      "change": -0.27
     },
     "THNQ": {
-      "price": 78.18,
-      "change": -5.82
+      "price": 75.05,
+      "change": -9.59
     },
     "SMH": {
       "price": 463.96,
@@ -50,7 +50,7 @@
       "change": -6.64
     },
     "AMAT": {
-      "price": 332.71,
+      "price": 332.72,
       "change": -11.16
     },
     "LRCX": {
@@ -66,8 +66,8 @@
       "change": -3.81
     },
     "ARM": {
-      "price": 174.62,
-      "change": -11.27
+      "price": 166.72,
+      "change": -15.28
     },
     "QCOM": {
       "price": 165.41,
@@ -90,16 +90,16 @@
       "change": -6.34
     },
     "BOTZ": {
-      "price": 31.05,
-      "change": -3.78
+      "price": 30.64,
+      "change": -5.05
     },
     "ITA": {
       "price": 68.98,
       "change": -3.61
     },
     "BDRY": {
-      "price": 13.24,
-      "change": 7.12
+      "price": 13.02,
+      "change": 5.34
     },
     "FXI": {
       "price": 34.95,
@@ -114,8 +114,8 @@
       "change": 10.68
     },
     "BTC-USD": {
-      "price": 75838.57,
-      "change": -1.09
+      "price": 75976.62,
+      "change": -1.77
     },
     "DX-Y.NYB": {
       "price": 102.28,
