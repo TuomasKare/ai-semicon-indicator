@@ -3,7 +3,14 @@ name: Update AI Macro Values
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/15 * * * *"   # every 30 minutes
+    - cron: "*/15 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: main-branch-data-writers
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -12,6 +19,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -28,12 +37,16 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
+
           git add ai_macro_values.json
-          git commit -m "auto: update AI macro values" || exit 0
-          git fetch origin main
-          git merge origin/main -m "Merge remote changes" || {
-            git checkout --theirs ai_macro_values.json
-            git add ai_macro_values.json
-            git commit -m "Merge remote changes (keeping remote version)"
-          }
-          git push origin main
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "auto: update AI macro values"
+
+          git fetch origin "${GITHUB_REF_NAME:-main}"
+          git rebase "origin/${GITHUB_REF_NAME:-main}"
+          git push origin "HEAD:${GITHUB_REF_NAME:-main}"
