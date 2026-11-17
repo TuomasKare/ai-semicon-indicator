@@ -2,8 +2,15 @@ name: Update AI Dashboard Data
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # Runs every 15 minutes
-  workflow_dispatch:         # Allows manual trigger
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: main-branch-data-writers
+  cancel-in-progress: false
 
 jobs:
   update-data:
@@ -14,6 +21,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         persist-credentials: true
+        fetch-depth: 0
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
@@ -37,6 +45,16 @@ jobs:
       run: |
         git config --global user.name "github-actions"
         git config --global user.email "github-actions@github.com"
+
         git add data.json ai_macro_values.json smh.json
-        git commit -m "Automated data update" || echo "No changes to commit"
-        git push
+
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+          exit 0
+        fi
+
+        git commit -m "Automated data update"
+
+        git fetch origin "${GITHUB_REF_NAME:-main}"
+        git rebase "origin/${GITHUB_REF_NAME:-main}"
+        git push origin "HEAD:${GITHUB_REF_NAME:-main}"
