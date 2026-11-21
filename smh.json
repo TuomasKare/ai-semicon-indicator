@@ -1,14 +1,14 @@
 {
-  "updated": "2026-11-20T18:50:16.331Z",
+  "updated": "2026-11-21T00:35:27.181Z",
   "symbol": "VVSM.DE",
   "name": "VanEck Semiconductor UCITS ETF USD A (XETR: VVSM)",
   "shares": 102.6,
-  "latestPriceEUR": 70.26,
-  "latestValueEUR": 7208.676,
+  "latestPriceEUR": 79.48,
+  "latestValueEUR": 8154.648,
   "allTimeHigh": 109.16,
-  "drawdownPercent": -35.64,
-  "sma20": 82.96,
-  "sma50": 90.93,
+  "drawdownPercent": -27.19,
+  "sma20": 83.81,
+  "sma50": 91.38,
   "exitSignal": "EXIT",
   "timestamps": [
     1763625600,
@@ -262,8 +262,7 @@
     1794816000,
     1794902400,
     1794988800,
-    1795075200,
-    1795161600
+    1795075200
   ],
   "closes": [
     50.15,
@@ -517,8 +516,7 @@
     79.89,
     76.51,
     78.05,
-    79.48,
-    70.26
+    79.48
   ],
   "holdings": {
     "NVDA": {
